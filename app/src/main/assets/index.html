@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Minimal TV Clock</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main id="display" class="display" aria-label="現在時刻と当月カレンダー">
+        <section class="clock-panel" aria-label="現在時刻">
+            <div id="time" class="time">--:--</div>
+            <div class="date-row">
+                <span id="date" class="date">----年--月--日</span>
+                <span id="weekday" class="weekday">---</span>
+            </div>
+        </section>
+
+        <aside class="calendar-panel" aria-label="当月カレンダー">
+            <div id="monthTitle" class="month-title">----年 --月</div>
+            <div class="calendar-weekdays" aria-hidden="true">
+                <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+            </div>
+            <div id="calendar" class="calendar-grid"></div>
+        </aside>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
