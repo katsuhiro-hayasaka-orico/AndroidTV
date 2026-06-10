@@ -1,10 +1,11 @@
 :root {
     color-scheme: dark;
-    --background-deep: #03050a;
-    --background-graphite: #0a1018;
-    --background-navy: #0b1424;
-    --panel: rgba(244, 248, 255, 0.065);
-    --panel-border: rgba(228, 237, 255, 0.11);
+    --background-deep: #02040a;
+    --background-graphite: #080e16;
+    --background-navy: #0a1628;
+    --panel: rgba(244, 248, 255, 0.043);
+    --panel-border: rgba(234, 242, 255, 0.135);
+    --panel-border-soft: rgba(234, 242, 255, 0.055);
     --text-primary: #f3f7ff;
     --text-secondary: #b5bfce;
     --text-muted: #717c8e;
@@ -24,9 +25,10 @@ body {
     margin: 0;
     overflow: hidden;
     background:
-        radial-gradient(circle at 18% 20%, rgba(30, 47, 76, 0.46), transparent 34%),
-        radial-gradient(circle at 82% 78%, rgba(43, 40, 52, 0.34), transparent 38%),
-        linear-gradient(135deg, var(--background-deep) 0%, var(--background-graphite) 48%, var(--background-navy) 100%);
+        radial-gradient(circle at 16% 18%, rgba(38, 58, 92, 0.54), transparent 35%),
+        radial-gradient(circle at 78% 76%, rgba(57, 50, 61, 0.38), transparent 40%),
+        radial-gradient(circle at 50% 108%, rgba(20, 34, 52, 0.36), transparent 38%),
+        linear-gradient(135deg, var(--background-deep) 0%, var(--background-graphite) 46%, var(--background-navy) 100%);
     color: var(--text-primary);
     font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
 }
@@ -42,9 +44,9 @@ body::before {
     pointer-events: none;
     content: "";
     background:
-        linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 24%, transparent 78%, rgba(255, 255, 255, 0.028)),
-        radial-gradient(circle at 50% 50%, transparent 54%, rgba(0, 0, 0, 0.24) 100%);
-    opacity: 0.78;
+        linear-gradient(115deg, rgba(255, 255, 255, 0.06), transparent 22%, transparent 76%, rgba(255, 255, 255, 0.03)),
+        radial-gradient(circle at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.27) 100%);
+    opacity: 0.82;
 }
 
 .display {
@@ -91,14 +93,62 @@ body::before {
 }
 
 .time {
-    font-family: "Avenir Next", "Century Gothic", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    display: inline-flex;
+    align-items: baseline;
+    font-family: "Avenir Next", "Century Gothic", "Trebuchet MS", "Segoe UI", "Roboto", system-ui, sans-serif;
     font-size: clamp(136px, 15.5vw, 298px);
-    line-height: 0.88;
-    font-weight: 680;
-    letter-spacing: -0.068em;
+    line-height: 0.86;
+    font-weight: 610;
+    letter-spacing: -0.087em;
     font-variant-numeric: tabular-nums;
     text-rendering: geometricPrecision;
-    text-shadow: 0 0 38px rgba(176, 199, 239, 0.13), 0 18px 52px rgba(0, 0, 0, 0.22);
+    text-shadow: 0 0 24px rgba(182, 206, 244, 0.115), 0 18px 46px rgba(0, 0, 0, 0.2);
+}
+
+.time-char {
+    display: inline-block;
+    min-width: 0.58em;
+    color: transparent;
+    background:
+        linear-gradient(180deg, #ffffff 0%, #eef4ff 28%, #b9c8dc 72%, #eef5ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(210, 226, 250, 0.075));
+}
+
+.time-char.digit {
+    text-align: center;
+}
+
+.time-char.colon {
+    min-width: 0.24em;
+    margin: 0 0.035em 0 0.055em;
+    font-weight: 430;
+    opacity: 0.74;
+    background: linear-gradient(180deg, #edf4ff, #97a9bd);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.digit-0,
+.digit-8 {
+    letter-spacing: -0.095em;
+}
+
+.digit-1 {
+    min-width: 0.43em;
+    font-weight: 560;
+    letter-spacing: -0.03em;
+}
+
+.digit-3,
+.digit-5,
+.digit-7 {
+    background-image: linear-gradient(180deg, #fbfdff 0%, #dbe6f4 36%, #9eafc4 100%);
+}
+
+.digit-4 {
+    min-width: 0.54em;
 }
 
 .analog-clock {
@@ -113,32 +163,43 @@ body::before {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    overflow: hidden;
     background:
-        radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.115), transparent 27%),
-        radial-gradient(circle at center, rgba(248, 251, 255, 0.035), rgba(248, 251, 255, 0.012) 58%, rgba(248, 251, 255, 0.055));
-    border: 1px solid rgba(231, 240, 255, 0.18);
+        linear-gradient(142deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.025) 36%, rgba(255, 255, 255, 0.055) 100%),
+        radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.145), transparent 28%),
+        radial-gradient(circle at center, rgba(248, 251, 255, 0.04), rgba(248, 251, 255, 0.012) 58%, rgba(248, 251, 255, 0.048));
+    border: 1px solid rgba(231, 240, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.34);
+    border-left-color: rgba(255, 255, 255, 0.26);
     box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.055),
-        inset 0 -34px 80px rgba(0, 0, 0, 0.18),
-        0 28px 86px rgba(0, 0, 0, 0.32),
-        0 0 56px rgba(166, 189, 224, 0.06);
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -26px 72px rgba(0, 0, 0, 0.13),
+        0 26px 76px rgba(0, 0, 0, 0.24),
+        0 0 62px rgba(177, 199, 232, 0.065);
+    -webkit-backdrop-filter: blur(18px) saturate(112%);
+    backdrop-filter: blur(18px) saturate(112%);
 }
 
 .analog-face::before,
 .analog-face::after {
     position: absolute;
-    inset: 8.5%;
     border-radius: 50%;
     content: "";
+    pointer-events: none;
 }
 
 .analog-face::before {
-    border: 1px solid rgba(231, 240, 255, 0.105);
+    inset: 8.5%;
+    border: 1px solid rgba(231, 240, 255, 0.118);
+    box-shadow: inset 18px 18px 46px rgba(255, 255, 255, 0.035);
 }
 
 .analog-face::after {
-    inset: 17.5%;
-    border: 1px solid rgba(231, 240, 255, 0.05);
+    inset: -20%;
+    background:
+        linear-gradient(118deg, transparent 20%, rgba(255, 255, 255, 0.13) 34%, transparent 49%),
+        radial-gradient(circle at 72% 20%, rgba(255, 255, 255, 0.075), transparent 22%);
+    opacity: 0.58;
 }
 
 .minute-ring {
@@ -152,7 +213,8 @@ body::before {
     );
     -webkit-mask: radial-gradient(circle, transparent 70.5%, #000 71.4%, #000 73.4%, transparent 74.2%);
     mask: radial-gradient(circle, transparent 70.5%, #000 71.4%, #000 73.4%, transparent 74.2%);
-    opacity: 0.58;
+    opacity: 0.5;
+    z-index: 1;
 }
 
 .hour-mark {
@@ -162,7 +224,8 @@ body::before {
     width: clamp(4px, 0.45vw, 8px);
     height: clamp(22px, 2.4vw, 42px);
     border-radius: 999px;
-    background: rgba(234, 241, 252, 0.52);
+    background: rgba(238, 245, 255, 0.56);
+    z-index: 2;
     transform-origin: center calc(50% + clamp(98px, 12.05vw, 199px));
 }
 
@@ -184,14 +247,16 @@ body::before {
     width: clamp(8px, 0.72vw, 14px);
     height: 26%;
     background: linear-gradient(180deg, #f1f6ff, #aebbd0);
-    box-shadow: 0 0 22px rgba(218, 230, 248, 0.16);
+    box-shadow: 0 0 16px rgba(218, 230, 248, 0.12);
+    z-index: 3;
 }
 
 .minute-hand {
     width: clamp(5px, 0.48vw, 9px);
     height: 36%;
     background: linear-gradient(180deg, #dce7f8, #8997ac);
-    box-shadow: 0 0 18px rgba(218, 230, 248, 0.13);
+    box-shadow: 0 0 16px rgba(218, 230, 248, 0.12);
+    z-index: 3;
 }
 
 .pin {
@@ -202,8 +267,9 @@ body::before {
     aspect-ratio: 1;
     border-radius: 50%;
     background: #eef4ff;
-    box-shadow: 0 0 0 clamp(5px, 0.46vw, 9px) rgba(238, 244, 255, 0.095), 0 0 24px rgba(219, 230, 248, 0.22);
+    box-shadow: 0 0 0 clamp(5px, 0.46vw, 9px) rgba(238, 244, 255, 0.085), 0 0 22px rgba(219, 230, 248, 0.18);
     transform: translate(-50%, -50%);
+    z-index: 4;
 }
 
 .date-row {
@@ -229,17 +295,50 @@ body::before {
 }
 
 .calendar-panel {
+    position: relative;
+    overflow: hidden;
     padding: clamp(30px, 3.1vw, 50px);
-    border: 1px solid var(--panel-border);
+    border: 1px solid var(--panel-border-soft);
+    border-top-color: rgba(255, 255, 255, 0.22);
+    border-left-color: rgba(255, 255, 255, 0.17);
     border-radius: clamp(30px, 3vw, 44px);
     background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.028)),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.018)),
         var(--panel);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        inset 0 -28px 70px rgba(0, 0, 0, 0.13),
-        0 24px 70px rgba(0, 0, 0, 0.23);
-    backdrop-filter: blur(18px);
+        inset 0 1px 0 rgba(255, 255, 255, 0.105),
+        inset 0 -20px 58px rgba(0, 0, 0, 0.095),
+        0 18px 54px rgba(0, 0, 0, 0.18),
+        0 0 46px rgba(155, 180, 218, 0.045);
+    -webkit-backdrop-filter: blur(22px) saturate(116%);
+    backdrop-filter: blur(22px) saturate(116%);
+}
+
+.calendar-panel::before,
+.calendar-panel::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+}
+
+.calendar-panel::before {
+    background: linear-gradient(126deg, rgba(255, 255, 255, 0.16), transparent 31%, transparent 72%, rgba(255, 255, 255, 0.035));
+    opacity: 0.6;
+}
+
+.calendar-panel::after {
+    background:
+        radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.055) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 78% 62%, rgba(255, 255, 255, 0.04) 0 1px, transparent 1.4px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006));
+    background-size: 28px 28px, 34px 34px, auto;
+    opacity: 0.34;
+}
+
+.calendar-panel > * {
+    position: relative;
+    z-index: 1;
 }
 
 .month-title {

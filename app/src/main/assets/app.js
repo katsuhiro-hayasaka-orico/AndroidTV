@@ -17,6 +17,7 @@ const analogLabelElement = document.getElementById('analogLabel');
 let renderedCalendarKey = '';
 let minuteTimerId;
 let clockMode = loadClockMode();
+let renderedTimeText = '';
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -62,7 +63,7 @@ function updateClock() {
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
-    timeElement.textContent = `${pad(hours)}:${pad(minutes)}`;
+    renderDigitalTime(`${pad(hours)}:${pad(minutes)}`);
     dateElement.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
     weekdayElement.textContent = new Intl.DateTimeFormat('ja-JP', { weekday: 'long' }).format(now);
     updateAnalogClock(hours, minutes);
@@ -74,6 +75,30 @@ function updateClock() {
     } else {
         highlightToday(now);
     }
+}
+
+function renderDigitalTime(timeText) {
+    if (timeText === renderedTimeText) {
+        return;
+    }
+
+    const timeCharacters = Array.from(timeText, (character) => {
+        const span = document.createElement('span');
+        span.classList.add('time-char');
+        span.textContent = character;
+
+        if (character === ':') {
+            span.classList.add('colon');
+        } else {
+            span.classList.add('digit', `digit-${character}`);
+        }
+
+        return span;
+    });
+
+    timeElement.replaceChildren(...timeCharacters);
+    timeElement.setAttribute('aria-label', timeText);
+    renderedTimeText = timeText;
 }
 
 function updateAnalogClock(hours, minutes) {
