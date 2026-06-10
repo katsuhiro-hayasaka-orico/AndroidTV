@@ -77,6 +77,14 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+        if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            // 数字フォントプリセット切り替えも、TVリモコンの左右キーからWebViewへ明示的に渡します。
+            if (webView != null) {
+                int direction = keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1;
+                webView.evaluateJavascript("window.cycleFontPresetFromAndroid && window.cycleFontPresetFromAndroid(" + direction + ")", null);
+            }
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 

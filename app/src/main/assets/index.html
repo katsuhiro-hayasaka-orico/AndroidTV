@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main id="display" class="display is-digital" aria-label="現在時刻と当月カレンダー">
+    <main id="display" class="display is-digital" data-font-preset="readable" aria-label="現在時刻と当月カレンダー">
         <section class="clock-panel" aria-label="現在時刻">
             <div class="clock-stage" aria-live="polite">
                 <div id="time" class="time" data-clock-view="digital">--:--</div>
@@ -41,6 +41,7 @@
             <div id="calendar" class="calendar-grid"></div>
         </aside>
     </main>
+    <div id="fontToast" class="font-toast" aria-hidden="true"></div>
 
     <script src="app.js"></script>
 </body>

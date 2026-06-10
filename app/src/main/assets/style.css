@@ -151,6 +151,142 @@ body::before {
     min-width: 0.54em;
 }
 
+.display[data-font-preset="readable"] .time {
+    font-family: "Avenir Next", "Segoe UI", "Roboto", "Helvetica Neue", system-ui, sans-serif;
+    font-weight: 650;
+    letter-spacing: -0.072em;
+}
+
+.display[data-font-preset="readable"] .time-char {
+    min-width: 0.6em;
+    margin-right: -0.012em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #eef5ff 32%, #c1cedf 78%, #f2f7ff 100%);
+    filter: drop-shadow(0 0 9px rgba(210, 226, 250, 0.07));
+}
+
+.display[data-font-preset="readable"] .digit-1 {
+    min-width: 0.45em;
+}
+
+.display[data-font-preset="soft"] .time {
+    font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", "Roboto", system-ui, sans-serif;
+    font-weight: 620;
+    letter-spacing: -0.052em;
+    text-shadow: 0 0 22px rgba(229, 220, 244, 0.12), 0 18px 42px rgba(0, 0, 0, 0.19);
+}
+
+.display[data-font-preset="soft"] .time-char {
+    min-width: 0.6em;
+    margin-right: -0.006em;
+    border-radius: 0.08em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #f3eefc 34%, #c9d5e4 76%, #f6fbff 100%);
+    filter: drop-shadow(0 0 11px rgba(226, 213, 244, 0.09));
+}
+
+.display[data-font-preset="soft"] .time-char.colon {
+    margin-inline: 0.07em 0.05em;
+    opacity: 0.68;
+    background-image: linear-gradient(180deg, #fff7fd, #a9bbce);
+}
+
+.display[data-font-preset="soft"] .digit-0,
+.display[data-font-preset="soft"] .digit-8 {
+    min-width: 0.62em;
+}
+
+.display[data-font-preset="soft"] .digit-1 {
+    min-width: 0.47em;
+    font-weight: 570;
+}
+
+.display[data-font-preset="handwritten"] .time {
+    font-family: "Comic Sans MS", "Segoe Print", "Trebuchet MS", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    font-weight: 590;
+    letter-spacing: -0.048em;
+    text-shadow: 0 0 18px rgba(220, 231, 248, 0.105), 0 16px 38px rgba(0, 0, 0, 0.18);
+}
+
+.display[data-font-preset="handwritten"] .time-char {
+    min-width: 0.58em;
+    margin-right: -0.004em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #e9f1fb 38%, #aebdd0 100%);
+    filter: drop-shadow(0 0 8px rgba(214, 229, 248, 0.065));
+}
+
+.display[data-font-preset="handwritten"] .time-char.colon {
+    min-width: 0.25em;
+    margin-inline: 0.055em 0.055em;
+    transform: translateY(-0.01em) rotate(-0.4deg);
+    opacity: 0.7;
+}
+
+.display[data-font-preset="handwritten"] .digit-0 { transform: translateY(0.008em) rotate(-0.7deg); }
+.display[data-font-preset="handwritten"] .digit-1 { min-width: 0.44em; transform: translateY(-0.012em) rotate(0.8deg); font-weight: 550; }
+.display[data-font-preset="handwritten"] .digit-2 { transform: translateY(0.012em) rotate(-0.5deg); }
+.display[data-font-preset="handwritten"] .digit-3 { transform: translateY(-0.006em) rotate(0.6deg); }
+.display[data-font-preset="handwritten"] .digit-4 { min-width: 0.55em; transform: translateY(0.01em) rotate(-0.6deg); }
+.display[data-font-preset="handwritten"] .digit-5 { transform: translateY(-0.01em) rotate(0.5deg); }
+.display[data-font-preset="handwritten"] .digit-6 { transform: translateY(0.006em) rotate(-0.4deg); }
+.display[data-font-preset="handwritten"] .digit-7 { transform: translateY(-0.014em) rotate(0.7deg); }
+.display[data-font-preset="handwritten"] .digit-8 { transform: translateY(0.004em) rotate(-0.5deg); }
+.display[data-font-preset="handwritten"] .digit-9 { transform: translateY(-0.008em) rotate(0.5deg); }
+
+.display[data-font-preset="design"] .time {
+    font-family: "Century Gothic", "Avenir Next", "Trebuchet MS", "Segoe UI", "Roboto", system-ui, sans-serif;
+    font-weight: 540;
+    letter-spacing: -0.13em;
+    text-shadow: 0 0 20px rgba(188, 213, 250, 0.1), 0 18px 44px rgba(0, 0, 0, 0.19);
+}
+
+.display[data-font-preset="design"] .time-char {
+    min-width: 0.55em;
+    margin-right: -0.05em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #dfe9f8 24%, #8fa2ba 64%, #f7fbff 100%);
+    filter: drop-shadow(0 0 8px rgba(199, 220, 250, 0.07));
+}
+
+.display[data-font-preset="design"] .time-char.colon {
+    min-width: 0.18em;
+    margin-inline: 0.018em 0.04em;
+    font-weight: 300;
+    opacity: 0.68;
+    transform: translateY(-0.055em);
+    background-image: linear-gradient(180deg, #f8fbff, #8094ad);
+}
+
+.display[data-font-preset="design"] .digit-0,
+.display[data-font-preset="design"] .digit-8 {
+    min-width: 0.51em;
+    font-stretch: condensed;
+    letter-spacing: -0.13em;
+    transform: scaleX(0.9) scaleY(1.045);
+    transform-origin: center bottom;
+}
+
+.display[data-font-preset="design"] .digit-1 {
+    min-width: 0.32em;
+    font-weight: 380;
+    letter-spacing: -0.03em;
+}
+
+.display[data-font-preset="design"] .digit-2,
+.display[data-font-preset="design"] .digit-3,
+.display[data-font-preset="design"] .digit-5,
+.display[data-font-preset="design"] .digit-7 {
+    min-width: 0.54em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #d7e2f2 30%, #8297b2 100%);
+}
+
+.display[data-font-preset="design"] .digit-4 {
+    min-width: 0.46em;
+    font-weight: 500;
+}
+
+.display[data-font-preset="design"] .digit-6,
+.display[data-font-preset="design"] .digit-9 {
+    min-width: 0.56em;
+}
+
 .analog-clock {
     width: clamp(260px, 31.5vw, 520px);
     aspect-ratio: 1;
@@ -384,6 +520,32 @@ body::before {
     color: var(--today-text);
     font-weight: 820;
     box-shadow: 0 0 30px rgba(226, 235, 250, 0.2);
+}
+
+.font-toast {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(26px, 3.2vw, 54px);
+    z-index: 5;
+    padding: 0.42em 0.84em;
+    border: 1px solid rgba(234, 242, 255, 0.11);
+    border-radius: 999px;
+    background: rgba(10, 16, 26, 0.42);
+    color: rgba(236, 243, 255, 0.82);
+    font-size: clamp(16px, 1.25vw, 24px);
+    font-weight: 560;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 10px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    -webkit-backdrop-filter: blur(16px) saturate(112%);
+    backdrop-filter: blur(16px) saturate(112%);
+}
+
+.font-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
 .sr-only {

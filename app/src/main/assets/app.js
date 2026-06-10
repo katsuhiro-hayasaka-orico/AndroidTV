@@ -1,8 +1,15 @@
 const STORAGE_KEY_CLOCK_MODE = 'minimalTvClock.clockMode';
+const STORAGE_KEY_FONT_PRESET = 'minimalTvClock.fontPreset';
 const CLOCK_MODES = {
     DIGITAL: 'digital',
     ANALOG: 'analog',
 };
+const FONT_PRESETS = [
+    { id: 'readable', label: 'Readable' },
+    { id: 'soft', label: 'Soft' },
+    { id: 'handwritten', label: 'Handwritten' },
+    { id: 'design', label: 'Design' },
+];
 
 const timeElement = document.getElementById('time');
 const dateElement = document.getElementById('date');
@@ -13,11 +20,14 @@ const displayElement = document.getElementById('display');
 const hourHandElement = document.getElementById('hourHand');
 const minuteHandElement = document.getElementById('minuteHand');
 const analogLabelElement = document.getElementById('analogLabel');
+const fontToastElement = document.getElementById('fontToast');
 
 let renderedCalendarKey = '';
 let minuteTimerId;
 let clockMode = loadClockMode();
+let fontPreset = loadFontPreset();
 let renderedTimeText = '';
+let fontToastTimerId;
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -41,6 +51,65 @@ function saveClockMode(mode) {
     } catch (error) {
         // 保存できない場合も一時的な切り替えは維持する。
     }
+}
+
+function isFontPresetId(presetId) {
+    return FONT_PRESETS.some((preset) => preset.id === presetId);
+}
+
+function getFontPresetLabel(presetId) {
+    const preset = FONT_PRESETS.find((item) => item.id === presetId);
+    return preset ? preset.label : FONT_PRESETS[0].label;
+}
+
+function loadFontPreset() {
+    try {
+        const storedPreset = window.localStorage.getItem(STORAGE_KEY_FONT_PRESET);
+        if (isFontPresetId(storedPreset)) {
+            return storedPreset;
+        }
+    } catch (error) {
+        // localStorage が利用できない環境でも既定プリセットで表示する。
+    }
+    return FONT_PRESETS[0].id;
+}
+
+function saveFontPreset(presetId) {
+    try {
+        window.localStorage.setItem(STORAGE_KEY_FONT_PRESET, presetId);
+    } catch (error) {
+        // 保存できない場合も一時的な切り替えは維持する。
+    }
+}
+
+function applyFontPreset(presetId, shouldAnnounce = false) {
+    const nextPreset = isFontPresetId(presetId) ? presetId : FONT_PRESETS[0].id;
+    fontPreset = nextPreset;
+    displayElement.setAttribute('data-font-preset', nextPreset);
+    saveFontPreset(nextPreset);
+
+    if (shouldAnnounce) {
+        showFontToast(nextPreset);
+    }
+}
+
+function cycleFontPreset(direction) {
+    const currentIndex = FONT_PRESETS.findIndex((preset) => preset.id === fontPreset);
+    const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+    const nextIndex = (safeIndex + direction + FONT_PRESETS.length) % FONT_PRESETS.length;
+    applyFontPreset(FONT_PRESETS[nextIndex].id, true);
+}
+
+function showFontToast(presetId) {
+    window.clearTimeout(fontToastTimerId);
+    fontToastElement.textContent = `Font: ${getFontPresetLabel(presetId)}`;
+    fontToastElement.classList.add('is-visible');
+    fontToastElement.setAttribute('aria-hidden', 'false');
+
+    fontToastTimerId = window.setTimeout(() => {
+        fontToastElement.classList.remove('is-visible');
+        fontToastElement.setAttribute('aria-hidden', 'true');
+    }, 2000);
 }
 
 function applyClockMode(mode) {
@@ -173,6 +242,7 @@ function nudgeDisplay() {
 }
 
 window.toggleClockModeFromAndroid = toggleClockMode;
+window.cycleFontPresetFromAndroid = cycleFontPreset;
 
 function handleClockModeKey(event) {
     const isDecisionKey = event.key === 'Enter'
@@ -181,15 +251,28 @@ function handleClockModeKey(event) {
         || event.code === 'NumpadEnter'
         || event.keyCode === 13
         || event.keyCode === 23;
+    const isNextFontKey = event.key === 'ArrowRight'
+        || event.code === 'ArrowRight'
+        || event.keyCode === 39
+        || event.keyCode === 22;
+    const isPreviousFontKey = event.key === 'ArrowLeft'
+        || event.code === 'ArrowLeft'
+        || event.keyCode === 37
+        || event.keyCode === 21;
 
-    if (!isDecisionKey) {
+    if (isDecisionKey) {
+        event.preventDefault();
+        toggleClockMode();
         return;
     }
 
-    event.preventDefault();
-    toggleClockMode();
+    if (isNextFontKey || isPreviousFontKey) {
+        event.preventDefault();
+        cycleFontPreset(isNextFontKey ? 1 : -1);
+    }
 }
 
+applyFontPreset(fontPreset);
 applyClockMode(clockMode);
 updateClock();
 scheduleNextMinuteTick();
