@@ -44,6 +44,7 @@
     --accent: #d8e4f7;
     --today: #e2ebfa;
     --today-text: #06101d;
+    --alarm-intensity: 0;
 }
 
 * {
@@ -68,17 +69,33 @@ body {
 body {
     display: grid;
     place-items: center;
+    isolation: isolate;
+}
+
+body::before,
+body::after {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    content: "";
 }
 
 body::before {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    content: "";
     background:
         linear-gradient(115deg, rgba(255, 255, 255, 0.06), transparent 22%, transparent 76%, rgba(255, 255, 255, 0.03)),
         radial-gradient(circle at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.27) 100%);
     opacity: 0.82;
+}
+
+body::after {
+    background:
+        radial-gradient(circle at 18% 30%, rgba(255, 178, 101, 0.62), transparent 31%),
+        radial-gradient(circle at 76% 24%, rgba(112, 226, 255, 0.36), transparent 28%),
+        radial-gradient(circle at 60% 92%, rgba(255, 206, 131, 0.34), transparent 38%);
+    mix-blend-mode: screen;
+    opacity: calc(var(--alarm-intensity) * 0.48);
+    transition: opacity 28s ease-in-out;
 }
 
 .display {
@@ -90,6 +107,7 @@ body::before {
     grid-template-columns: minmax(0, 1.34fr) minmax(370px, 0.78fr);
     gap: clamp(46px, 5.7vw, 104px);
     align-items: center;
+    z-index: 1;
     transition: transform 1200ms ease-in-out;
     will-change: transform;
 }
@@ -101,6 +119,8 @@ body::before {
 }
 
 .clock-stage {
+    position: relative;
+    z-index: 1;
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -664,6 +684,88 @@ body::before {
     background: none;
     color: var(--today-text);
     filter: none;
+}
+
+.time,
+.time-char,
+.calendar-title-number,
+.calendar-number,
+.calendar-panel,
+.analog-face,
+.calendar-day.is-today {
+    transition:
+        border-color 28s ease-in-out,
+        box-shadow 28s ease-in-out,
+        filter 28s ease-in-out,
+        opacity 28s ease-in-out,
+        text-shadow 28s ease-in-out;
+}
+
+.clock-panel {
+    position: relative;
+}
+
+.clock-panel::before {
+    position: absolute;
+    inset: clamp(-42px, -4vw, -18px);
+    z-index: 0;
+    border-radius: 42%;
+    pointer-events: none;
+    content: "";
+    background:
+        radial-gradient(circle at 42% 52%, rgba(255, 199, 126, 0.22), transparent 58%),
+        radial-gradient(circle at 64% 42%, rgba(121, 226, 255, 0.12), transparent 48%);
+    opacity: calc(var(--alarm-intensity) * 0.72);
+    filter: blur(8px);
+    transition: opacity 28s ease-in-out;
+}
+
+.time {
+    text-shadow:
+        0 0 24px rgba(182, 206, 244, 0.115),
+        0 18px 46px rgba(0, 0, 0, 0.2),
+        0 0 calc(34px * var(--alarm-intensity)) rgba(255, 205, 144, 0.22),
+        0 0 calc(58px * var(--alarm-intensity)) rgba(107, 221, 255, 0.12);
+}
+
+.time-char,
+.calendar-title-number,
+.calendar-number {
+    filter:
+        drop-shadow(0 0 10px rgba(210, 226, 250, 0.075))
+        drop-shadow(0 0 calc(15px * var(--alarm-intensity)) rgba(255, 212, 150, 0.22));
+}
+
+.calendar-panel {
+    outline: calc(2px * var(--alarm-intensity)) solid rgba(255, 213, 151, 0.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.105),
+        inset 0 -20px 58px rgba(0, 0, 0, 0.095),
+        0 18px 54px rgba(0, 0, 0, 0.18),
+        0 0 46px rgba(155, 180, 218, 0.045),
+        0 0 calc(54px * var(--alarm-intensity)) rgba(255, 188, 108, 0.14),
+        0 0 calc(88px * var(--alarm-intensity)) rgba(104, 218, 255, 0.075);
+}
+
+.analog-face {
+    outline: calc(2px * var(--alarm-intensity)) solid rgba(255, 213, 151, 0.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -26px 72px rgba(0, 0, 0, 0.13),
+        0 26px 76px rgba(0, 0, 0, 0.24),
+        0 0 62px rgba(177, 199, 232, 0.065),
+        0 0 calc(58px * var(--alarm-intensity)) rgba(255, 196, 122, 0.16),
+        0 0 calc(92px * var(--alarm-intensity)) rgba(111, 221, 255, 0.08);
+}
+
+.calendar-day.is-today {
+    box-shadow:
+        0 0 30px rgba(226, 235, 250, 0.2),
+        0 0 calc(30px * var(--alarm-intensity)) rgba(255, 202, 130, 0.2);
+}
+
+.display[data-alarm-phase="idle"] .clock-panel::before {
+    opacity: 0;
 }
 
 .font-toast {
