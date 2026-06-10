@@ -10,11 +10,22 @@ const FONT_PRESETS = [
     { id: 'handwritten', label: 'Handwritten' },
     { id: 'design', label: 'Design' },
 ];
+const VISUAL_ALARM = {
+    enabled: true,
+    hour: 17,
+    minute: 0,
+    leadMinutes: 30,
+    fadeOutMinutes: 10,
+};
+const VISUAL_ALARM_UPDATE_INTERVAL_MS = 30 * 1000;
+const MINUTE_IN_MS = 60 * 1000;
+const DAY_IN_MS = 24 * 60 * MINUTE_IN_MS;
 
 const timeElement = document.getElementById('time');
 const monthTitleElement = document.getElementById('monthTitle');
 const calendarElement = document.getElementById('calendar');
 const displayElement = document.getElementById('display');
+const analogClockElement = document.querySelector('.analog-clock');
 const hourHandElement = document.getElementById('hourHand');
 const minuteHandElement = document.getElementById('minuteHand');
 const analogLabelElement = document.getElementById('analogLabel');
@@ -22,11 +33,13 @@ const fontToastElement = document.getElementById('fontToast');
 
 let renderedCalendarKey = '';
 let minuteTimerId;
+let visualAlarmTimerId;
 let clockMode = loadClockMode();
 let fontPreset = loadFontPreset();
 let renderedTimeText = '';
 let fontToastTimerId;
 let fitDigitalTimeFrameId;
+let lastClockToggleAt = Number.NEGATIVE_INFINITY;
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -113,17 +126,46 @@ function showFontToast(presetId) {
     }, 2000);
 }
 
+function normalizeClockMode(mode) {
+    return mode === CLOCK_MODES.ANALOG ? CLOCK_MODES.ANALOG : CLOCK_MODES.DIGITAL;
+}
+
 function applyClockMode(mode) {
-    clockMode = mode;
-    displayElement.classList.toggle('is-digital', mode === CLOCK_MODES.DIGITAL);
-    displayElement.classList.toggle('is-analog', mode === CLOCK_MODES.ANALOG);
-    displayElement.setAttribute('data-clock-mode', mode);
-    timeElement.setAttribute('aria-hidden', String(mode !== CLOCK_MODES.DIGITAL));
-    analogLabelElement.setAttribute('aria-hidden', String(mode !== CLOCK_MODES.ANALOG));
-    saveClockMode(mode);
+    const nextMode = normalizeClockMode(mode);
+    const isDigitalMode = nextMode === CLOCK_MODES.DIGITAL;
+
+    clockMode = nextMode;
+    displayElement.classList.remove('is-digital', 'is-analog');
+    displayElement.classList.add(isDigitalMode ? 'is-digital' : 'is-analog');
+    displayElement.setAttribute('data-clock-mode', nextMode);
+
+    timeElement.hidden = !isDigitalMode;
+    timeElement.setAttribute('aria-hidden', String(!isDigitalMode));
+
+    if (analogClockElement) {
+        analogClockElement.hidden = isDigitalMode;
+        analogClockElement.setAttribute('aria-hidden', String(isDigitalMode));
+    }
+    analogLabelElement.setAttribute('aria-hidden', String(isDigitalMode));
+
+    if (isDigitalMode) {
+        scheduleFitDigitalTime();
+    }
+
+    saveClockMode(nextMode);
+}
+
+function getMonotonicNow() {
+    return window.performance ? window.performance.now() : Date.now();
 }
 
 function toggleClockMode() {
+    const now = getMonotonicNow();
+    if (now - lastClockToggleAt < 250) {
+        return;
+    }
+
+    lastClockToggleAt = now;
     const nextMode = clockMode === CLOCK_MODES.DIGITAL ? CLOCK_MODES.ANALOG : CLOCK_MODES.DIGITAL;
     applyClockMode(nextMode);
 }
@@ -133,6 +175,7 @@ function updateClock() {
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
+    updateVisualAlarm(now);
     renderDigitalTime(`${pad(hours)}:${pad(minutes)}`);
     updateAnalogClock(hours, minutes);
 
@@ -203,6 +246,74 @@ function updateAnalogClock(hours, minutes) {
     hourHandElement.style.transform = `translateX(-50%) rotate(${hourDegrees}deg)`;
     minuteHandElement.style.transform = `translateX(-50%) rotate(${minuteDegrees}deg)`;
     analogLabelElement.textContent = `${hours}時${pad(minutes)}分`;
+}
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function smoothStep(value) {
+    const clampedValue = clamp(value, 0, 1);
+    return clampedValue * clampedValue * (3 - (2 * clampedValue));
+}
+
+function createVisualAlarmTargetDate(referenceDate, dayOffset) {
+    const targetDate = new Date(referenceDate);
+    targetDate.setHours(VISUAL_ALARM.hour, VISUAL_ALARM.minute, 0, 0);
+    targetDate.setTime(targetDate.getTime() + (dayOffset * DAY_IN_MS));
+    return targetDate;
+}
+
+function getVisualAlarmState(now) {
+    if (!VISUAL_ALARM.enabled) {
+        return { intensity: 0, phase: 'idle' };
+    }
+
+    const leadDuration = Math.max(0, VISUAL_ALARM.leadMinutes) * MINUTE_IN_MS;
+    const fadeOutDuration = Math.max(0, VISUAL_ALARM.fadeOutMinutes) * MINUTE_IN_MS;
+    const activeHoldDuration = VISUAL_ALARM_UPDATE_INTERVAL_MS;
+
+    for (let dayOffset = -1; dayOffset <= 1; dayOffset += 1) {
+        const targetDate = createVisualAlarmTargetDate(now, dayOffset);
+        const targetTime = targetDate.getTime();
+        const nowTime = now.getTime();
+        const approachStart = targetTime - leadDuration;
+        const cooldownEnd = targetTime + fadeOutDuration;
+
+        if (leadDuration > 0 && nowTime >= approachStart && nowTime < targetTime) {
+            return {
+                intensity: smoothStep((nowTime - approachStart) / leadDuration),
+                phase: 'approaching',
+            };
+        }
+
+        if (nowTime >= targetTime && nowTime < targetTime + activeHoldDuration) {
+            return { intensity: 1, phase: 'active' };
+        }
+
+        if (fadeOutDuration > 0 && nowTime >= targetTime + activeHoldDuration && nowTime <= cooldownEnd) {
+            return {
+                intensity: 1 - smoothStep((nowTime - targetTime) / fadeOutDuration),
+                phase: 'cooldown',
+            };
+        }
+    }
+
+    return { intensity: 0, phase: 'idle' };
+}
+
+function updateVisualAlarm(now) {
+    const { intensity, phase } = getVisualAlarmState(now);
+    const safeIntensity = clamp(intensity, 0, 1);
+    document.documentElement.style.setProperty('--alarm-intensity', safeIntensity.toFixed(3));
+    displayElement.setAttribute('data-alarm-phase', phase);
+}
+
+function scheduleVisualAlarmUpdates() {
+    window.clearInterval(visualAlarmTimerId);
+    visualAlarmTimerId = window.setInterval(() => {
+        updateVisualAlarm(new Date());
+    }, VISUAL_ALARM_UPDATE_INTERVAL_MS);
 }
 
 function scheduleNextMinuteTick() {
@@ -311,6 +422,9 @@ function handleClockModeKey(event) {
 
     if (isDecisionKey) {
         event.preventDefault();
+        if (event.repeat) {
+            return;
+        }
         toggleClockMode();
         return;
     }
@@ -325,6 +439,7 @@ applyFontPreset(fontPreset);
 applyClockMode(clockMode);
 updateClock();
 scheduleNextMinuteTick();
+scheduleVisualAlarmUpdates();
 nudgeDisplay();
 window.setInterval(nudgeDisplay, 6 * 60 * 1000);
 window.addEventListener('resize', scheduleFitDigitalTime);
