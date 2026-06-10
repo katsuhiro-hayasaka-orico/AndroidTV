@@ -20,6 +20,7 @@ const VISUAL_ALARM = {
 const VISUAL_ALARM_UPDATE_INTERVAL_MS = 30 * 1000;
 const MINUTE_IN_MS = 60 * 1000;
 const DAY_IN_MS = 24 * 60 * MINUTE_IN_MS;
+const TIME_FIT_MIN_SCALE = 0.8;
 
 const timeElement = document.getElementById('time');
 const monthTitleElement = document.getElementById('monthTitle');
@@ -226,7 +227,7 @@ function fitDigitalTime() {
         return;
     }
 
-    const nextScale = Math.max(0.86, Math.min(1, availableWidth / requiredWidth));
+    const nextScale = Math.max(TIME_FIT_MIN_SCALE, Math.min(1, availableWidth / requiredWidth));
     timeElement.style.setProperty('--time-fit-scale', nextScale.toFixed(3));
 }
 

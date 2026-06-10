@@ -174,7 +174,7 @@ body::after {
     transform-origin: left center;
     will-change: transform;
     font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
-    font-size: clamp(128px, 14.7vw, 282px);
+    font-size: clamp(148px, 16.6vw, 328px);
     line-height: 0.86;
     font-weight: 610;
     letter-spacing: -0.087em;
