@@ -135,6 +135,12 @@ body::after {
     transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
 }
 
+[data-clock-view][hidden],
+.display.is-digital .analog-clock[data-clock-view="analog"],
+.display.is-analog .time[data-clock-view="digital"] {
+    display: none !important;
+}
+
 .display.is-digital [data-clock-view="analog"],
 .display.is-analog [data-clock-view="digital"] {
     pointer-events: none;

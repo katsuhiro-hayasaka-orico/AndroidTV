@@ -25,6 +25,7 @@ const timeElement = document.getElementById('time');
 const monthTitleElement = document.getElementById('monthTitle');
 const calendarElement = document.getElementById('calendar');
 const displayElement = document.getElementById('display');
+const analogClockElement = document.querySelector('.analog-clock');
 const hourHandElement = document.getElementById('hourHand');
 const minuteHandElement = document.getElementById('minuteHand');
 const analogLabelElement = document.getElementById('analogLabel');
@@ -38,6 +39,7 @@ let fontPreset = loadFontPreset();
 let renderedTimeText = '';
 let fontToastTimerId;
 let fitDigitalTimeFrameId;
+let lastClockToggleAt = Number.NEGATIVE_INFINITY;
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -124,17 +126,46 @@ function showFontToast(presetId) {
     }, 2000);
 }
 
+function normalizeClockMode(mode) {
+    return mode === CLOCK_MODES.ANALOG ? CLOCK_MODES.ANALOG : CLOCK_MODES.DIGITAL;
+}
+
 function applyClockMode(mode) {
-    clockMode = mode;
-    displayElement.classList.toggle('is-digital', mode === CLOCK_MODES.DIGITAL);
-    displayElement.classList.toggle('is-analog', mode === CLOCK_MODES.ANALOG);
-    displayElement.setAttribute('data-clock-mode', mode);
-    timeElement.setAttribute('aria-hidden', String(mode !== CLOCK_MODES.DIGITAL));
-    analogLabelElement.setAttribute('aria-hidden', String(mode !== CLOCK_MODES.ANALOG));
-    saveClockMode(mode);
+    const nextMode = normalizeClockMode(mode);
+    const isDigitalMode = nextMode === CLOCK_MODES.DIGITAL;
+
+    clockMode = nextMode;
+    displayElement.classList.remove('is-digital', 'is-analog');
+    displayElement.classList.add(isDigitalMode ? 'is-digital' : 'is-analog');
+    displayElement.setAttribute('data-clock-mode', nextMode);
+
+    timeElement.hidden = !isDigitalMode;
+    timeElement.setAttribute('aria-hidden', String(!isDigitalMode));
+
+    if (analogClockElement) {
+        analogClockElement.hidden = isDigitalMode;
+        analogClockElement.setAttribute('aria-hidden', String(isDigitalMode));
+    }
+    analogLabelElement.setAttribute('aria-hidden', String(isDigitalMode));
+
+    if (isDigitalMode) {
+        scheduleFitDigitalTime();
+    }
+
+    saveClockMode(nextMode);
+}
+
+function getMonotonicNow() {
+    return window.performance ? window.performance.now() : Date.now();
 }
 
 function toggleClockMode() {
+    const now = getMonotonicNow();
+    if (now - lastClockToggleAt < 250) {
+        return;
+    }
+
+    lastClockToggleAt = now;
     const nextMode = clockMode === CLOCK_MODES.DIGITAL ? CLOCK_MODES.ANALOG : CLOCK_MODES.DIGITAL;
     applyClockMode(nextMode);
 }
@@ -391,6 +422,9 @@ function handleClockModeKey(event) {
 
     if (isDecisionKey) {
         event.preventDefault();
+        if (event.repeat) {
+            return;
+        }
         toggleClockMode();
         return;
     }
