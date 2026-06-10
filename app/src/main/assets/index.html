@@ -7,13 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main id="display" class="display" aria-label="現在時刻と当月カレンダー">
+    <main id="display" class="display is-digital" data-font-preset="readable" aria-label="現在時刻と当月カレンダー">
         <section class="clock-panel" aria-label="現在時刻">
-            <div id="time" class="time">--:--</div>
-            <div class="date-row">
-                <span id="date" class="date">----年--月--日</span>
-                <span id="weekday" class="weekday">---</span>
+            <div class="clock-stage" aria-live="polite">
+                <div id="time" class="time" data-clock-view="digital">--:--</div>
+
+                <div class="analog-clock" data-clock-view="analog" aria-label="アナログ時計" role="img">
+                    <div class="analog-face" aria-hidden="true">
+                        <span class="hour-mark mark-12"></span>
+                        <span class="hour-mark mark-3"></span>
+                        <span class="hour-mark mark-6"></span>
+                        <span class="hour-mark mark-9"></span>
+                        <span class="minute-ring"></span>
+                        <span class="hand hour-hand" id="hourHand"></span>
+                        <span class="hand minute-hand" id="minuteHand"></span>
+                        <span class="pin"></span>
+                    </div>
+                    <span id="analogLabel" class="sr-only">--時--分</span>
+                </div>
             </div>
+
         </section>
 
         <aside class="calendar-panel" aria-label="当月カレンダー">
@@ -24,6 +37,7 @@
             <div id="calendar" class="calendar-grid"></div>
         </aside>
     </main>
+    <div id="fontToast" class="font-toast" aria-hidden="true"></div>
 
     <script src="app.js"></script>
 </body>
