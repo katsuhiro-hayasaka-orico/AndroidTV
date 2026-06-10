@@ -137,6 +137,32 @@ body::before {
     transform: translateY(0) scale(1);
 }
 
+.clock-stage {
+    min-height: clamp(230px, 28vw, 465px);
+    display: grid;
+    align-items: center;
+}
+
+[data-clock-view] {
+    grid-area: 1 / 1;
+    transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
+}
+
+.display.is-digital [data-clock-view="analog"],
+.display.is-analog [data-clock-view="digital"] {
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: blur(4px);
+}
+
+.display.is-digital [data-clock-view="digital"],
+.display.is-analog [data-clock-view="analog"] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
 .time {
     --time-fit-scale: 1;
     display: inline-flex;
