@@ -486,6 +486,22 @@ body::after {
     z-index: 4;
 }
 
+.analog-brand {
+    position: absolute;
+    left: 50%;
+    bottom: 22%;
+    z-index: 2;
+    color: rgba(232, 242, 255, 0.36);
+    font-size: clamp(14px, 1.18vw, 22px);
+    font-weight: 560;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    pointer-events: none;
+    transform: translateX(-50%);
+    user-select: none;
+}
+
 
 .calendar-panel {
     position: relative;
@@ -772,6 +788,58 @@ body::after {
 
 .display[data-alarm-phase="idle"] .clock-panel::before {
     opacity: 0;
+}
+
+.lab-signature {
+    position: absolute;
+    right: clamp(30px, 3.2vw, 58px);
+    bottom: clamp(28px, 3vw, 52px);
+    z-index: 2;
+    color: rgba(225, 238, 255, 0.28);
+    font-size: clamp(11px, 0.8vw, 15px);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
+.launch-credit {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(118px, 10vw, 168px);
+    z-index: 4;
+    color: rgba(228, 240, 255, 0);
+    font-size: clamp(14px, 1.08vw, 20px);
+    font-weight: 520;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    pointer-events: none;
+    text-transform: none;
+    transform: translate(-50%, 8px);
+    user-select: none;
+    animation: launch-credit-fade 3200ms ease-out 420ms forwards;
+}
+
+@keyframes launch-credit-fade {
+    0% {
+        color: rgba(228, 240, 255, 0);
+        opacity: 0;
+        transform: translate(-50%, 8px);
+    }
+
+    18%,
+    58% {
+        color: rgba(228, 240, 255, 0.42);
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    100% {
+        color: rgba(228, 240, 255, 0);
+        opacity: 0;
+        transform: translate(-50%, -2px);
+    }
 }
 
 .font-toast,
