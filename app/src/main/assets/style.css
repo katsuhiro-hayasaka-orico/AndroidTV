@@ -104,7 +104,7 @@ body::before {
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    min-height: clamp(230px, 28vw, 465px);
+    min-height: clamp(260px, 30vw, 500px);
     display: grid;
     align-items: center;
     overflow: hidden;
@@ -135,32 +135,6 @@ body::before {
 
 .display.is-analog .analog-clock[data-clock-view="analog"] {
     transform: translateY(0) scale(1);
-}
-
-.clock-stage {
-    min-height: clamp(230px, 28vw, 465px);
-    display: grid;
-    align-items: center;
-}
-
-[data-clock-view] {
-    grid-area: 1 / 1;
-    transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
-}
-
-.display.is-digital [data-clock-view="analog"],
-.display.is-analog [data-clock-view="digital"] {
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(10px) scale(0.985);
-    filter: blur(4px);
-}
-
-.display.is-digital [data-clock-view="digital"],
-.display.is-analog [data-clock-view="analog"] {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
 }
 
 .time {
@@ -486,27 +460,6 @@ body::before {
     z-index: 4;
 }
 
-.date-row {
-    margin-top: clamp(26px, 2.8vw, 50px);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.72em;
-    align-items: baseline;
-    color: var(--text-secondary);
-    font-weight: 560;
-    letter-spacing: 0.035em;
-    text-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
-}
-
-.date {
-    font-size: clamp(36px, 4.1vw, 74px);
-}
-
-.weekday {
-    font-size: clamp(31px, 3.2vw, 58px);
-    color: var(--text-primary);
-    font-weight: 620;
-}
 
 .calendar-panel {
     position: relative;
@@ -585,12 +538,58 @@ body::before {
     place-items: center;
     border-radius: 999px;
     color: var(--text-secondary);
-    font-size: clamp(24px, 2.08vw, 38px);
-    font-weight: 580;
 }
 
 .calendar-day.is-empty {
     color: transparent;
+}
+
+.calendar-number {
+    display: inline-grid;
+    min-width: 2ch;
+    place-items: center;
+    color: currentColor;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: clamp(24px, 2.08vw, 38px);
+    font-weight: 610;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #f9fbff 0%, #c4cfdd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 7px rgba(210, 226, 250, 0.055));
+}
+
+.display[data-font-preset="readable"] .calendar-number {
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-weight: 640;
+    letter-spacing: 0.005em;
+}
+
+.display[data-font-preset="soft"] .calendar-number {
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
+    font-weight: 610;
+    letter-spacing: 0.018em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #c9d5e4 100%);
+    filter: drop-shadow(0 0 8px rgba(226, 213, 244, 0.065));
+}
+
+.display[data-font-preset="handwritten"] .calendar-number {
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
+    font-weight: 590;
+    letter-spacing: 0.01em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #afbdd0 100%);
+}
+
+.display[data-font-preset="design"] .calendar-number {
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
+    min-width: 1.85ch;
+    font-weight: 540;
+    letter-spacing: -0.018em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #879bb5 100%);
 }
 
 .calendar-day.is-today {
@@ -598,6 +597,12 @@ body::before {
     color: var(--today-text);
     font-weight: 820;
     box-shadow: 0 0 30px rgba(226, 235, 250, 0.2);
+}
+
+.calendar-day.is-today .calendar-number {
+    background: none;
+    color: var(--today-text);
+    filter: none;
 }
 
 .font-toast {

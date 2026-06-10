@@ -12,8 +12,6 @@ const FONT_PRESETS = [
 ];
 
 const timeElement = document.getElementById('time');
-const dateElement = document.getElementById('date');
-const weekdayElement = document.getElementById('weekday');
 const monthTitleElement = document.getElementById('monthTitle');
 const calendarElement = document.getElementById('calendar');
 const displayElement = document.getElementById('display');
@@ -136,8 +134,6 @@ function updateClock() {
     const minutes = now.getMinutes();
 
     renderDigitalTime(`${pad(hours)}:${pad(minutes)}`);
-    dateElement.textContent = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-    weekdayElement.textContent = new Intl.DateTimeFormat('ja-JP', { weekday: 'long' }).format(now);
     updateAnalogClock(hours, minutes);
 
     const calendarKey = `${now.getFullYear()}-${now.getMonth()}`;
@@ -244,10 +240,15 @@ function renderCalendar(referenceDate) {
 function createCalendarCell(label, isEmpty) {
     const cell = document.createElement('span');
     cell.className = isEmpty ? 'calendar-day is-empty' : 'calendar-day';
-    cell.textContent = label;
     if (isEmpty) {
         cell.setAttribute('aria-hidden', 'true');
+        return cell;
     }
+
+    const number = document.createElement('span');
+    number.className = 'calendar-number';
+    number.textContent = label;
+    cell.appendChild(number);
     return cell;
 }
 
