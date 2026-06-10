@@ -221,7 +221,7 @@ function renderCalendar(referenceDate) {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
-    monthTitleElement.textContent = `${year}年 ${month + 1}月`;
+    renderMonthTitle(year, month + 1);
     calendarElement.textContent = '';
 
     for (let i = 0; i < firstDay.getDay(); i += 1) {
@@ -235,6 +235,23 @@ function renderCalendar(referenceDate) {
     }
 
     highlightToday(referenceDate);
+}
+
+function createMonthTitlePart(className, text) {
+    const part = document.createElement('span');
+    part.className = className;
+    part.textContent = text;
+    return part;
+}
+
+function renderMonthTitle(year, displayMonth) {
+    monthTitleElement.replaceChildren(
+        createMonthTitlePart('calendar-title-number', String(year)),
+        createMonthTitlePart('calendar-title-unit', '年'),
+        createMonthTitlePart('calendar-title-spacer', ' '),
+        createMonthTitlePart('calendar-title-number', String(displayMonth)),
+        createMonthTitlePart('calendar-title-unit', '月')
+    );
 }
 
 function createCalendarCell(label, isEmpty) {

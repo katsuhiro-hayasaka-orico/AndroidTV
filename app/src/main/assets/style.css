@@ -510,10 +510,71 @@ body::before {
 
 .month-title {
     margin-bottom: clamp(22px, 2.2vw, 38px);
+    display: inline-flex;
+    align-items: baseline;
     color: var(--text-primary);
     font-size: clamp(32px, 2.9vw, 50px);
     font-weight: 660;
     letter-spacing: 0.035em;
+    white-space: nowrap;
+}
+
+.calendar-title-number {
+    display: inline-block;
+    min-width: 1ch;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: 1.04em;
+    font-weight: 670;
+    line-height: 1;
+    letter-spacing: 0.012em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #ffffff 0%, #c8d4e4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 9px rgba(210, 226, 250, 0.075));
+}
+
+.calendar-title-unit {
+    margin-inline: 0.08em 0.18em;
+    color: rgba(243, 247, 255, 0.82);
+    font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.78em;
+    font-weight: 620;
+    letter-spacing: 0.04em;
+}
+
+.calendar-title-spacer {
+    width: 0.24em;
+    flex: 0 0 0.24em;
+}
+
+.display[data-font-preset="readable"] .calendar-title-number {
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-weight: 690;
+    letter-spacing: 0.008em;
+}
+
+.display[data-font-preset="soft"] .calendar-title-number {
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
+    font-weight: 640;
+    letter-spacing: 0.02em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #cbd8e7 100%);
+    filter: drop-shadow(0 0 10px rgba(226, 213, 244, 0.08));
+}
+
+.display[data-font-preset="handwritten"] .calendar-title-number {
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
+    font-weight: 610;
+    letter-spacing: 0.012em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #b7c6d8 100%);
+}
+
+.display[data-font-preset="design"] .calendar-title-number {
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
+    font-weight: 560;
+    letter-spacing: -0.015em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #8fa4bf 100%);
 }
 
 .calendar-weekdays,
