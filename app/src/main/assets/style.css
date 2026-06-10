@@ -1,12 +1,49 @@
+@font-face {
+    font-family: "ClockReadable";
+    src: url("fonts/readable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockSoft";
+    src: url("fonts/soft.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockHandwritten";
+    src: url("fonts/handwritten.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockDesign";
+    src: url("fonts/design.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     color-scheme: dark;
-    --background: #05070d;
-    --panel: rgba(255, 255, 255, 0.045);
-    --text-primary: #f6f8ff;
-    --text-secondary: #aeb7c8;
-    --text-muted: #687286;
-    --today: #dbe6ff;
-    --today-text: #07101f;
+    --background-deep: #02040a;
+    --background-graphite: #080e16;
+    --background-navy: #0a1628;
+    --panel: rgba(244, 248, 255, 0.043);
+    --panel-border: rgba(234, 242, 255, 0.135);
+    --panel-border-soft: rgba(234, 242, 255, 0.055);
+    --text-primary: #f3f7ff;
+    --text-secondary: #b5bfce;
+    --text-muted: #717c8e;
+    --accent: #d8e4f7;
+    --today: #e2ebfa;
+    --today-text: #06101d;
 }
 
 * {
@@ -19,9 +56,13 @@ body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    background: radial-gradient(circle at 18% 22%, rgba(24, 38, 70, 0.55), transparent 38%), var(--background);
+    background:
+        radial-gradient(circle at 16% 18%, rgba(38, 58, 92, 0.54), transparent 35%),
+        radial-gradient(circle at 78% 76%, rgba(57, 50, 61, 0.38), transparent 40%),
+        radial-gradient(circle at 50% 108%, rgba(20, 34, 52, 0.36), transparent 38%),
+        linear-gradient(135deg, var(--background-deep) 0%, var(--background-graphite) 46%, var(--background-navy) 100%);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+    font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
 }
 
 body {
@@ -29,13 +70,25 @@ body {
     place-items: center;
 }
 
+body::before {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+    background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.06), transparent 22%, transparent 76%, rgba(255, 255, 255, 0.03)),
+        radial-gradient(circle at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.27) 100%);
+    opacity: 0.82;
+}
+
 .display {
+    position: relative;
     width: min(100vw, 1920px);
     height: min(100vh, 1080px);
-    padding: clamp(56px, 7vw, 132px);
+    padding: clamp(58px, 7vw, 128px);
     display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.75fr);
-    gap: clamp(56px, 7vw, 128px);
+    grid-template-columns: minmax(0, 1.34fr) minmax(370px, 0.78fr);
+    gap: clamp(46px, 5.7vw, 104px);
     align-items: center;
     transition: transform 1200ms ease-in-out;
     will-change: transform;
@@ -43,66 +96,501 @@ body {
 
 .clock-panel {
     min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.clock-stage {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: clamp(260px, 30vw, 500px);
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+}
+
+[data-clock-view] {
+    grid-area: 1 / 1;
+    transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
+}
+
+.display.is-digital [data-clock-view="analog"],
+.display.is-analog [data-clock-view="digital"] {
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: blur(4px);
+}
+
+.display.is-digital [data-clock-view="digital"],
+.display.is-analog [data-clock-view="analog"] {
+    opacity: 1;
+    filter: blur(0);
+}
+
+.display.is-digital .time[data-clock-view="digital"] {
+    transform: translateY(0) scale(var(--time-fit-scale, 1));
+}
+
+.display.is-analog .analog-clock[data-clock-view="analog"] {
+    transform: translateY(0) scale(1);
 }
 
 .time {
-    font-size: clamp(132px, 15.2vw, 292px);
-    line-height: 0.9;
-    font-weight: 700;
-    letter-spacing: -0.075em;
-    font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 30px rgba(180, 200, 255, 0.12);
-}
-
-.date-row {
-    margin-top: clamp(28px, 3vw, 52px);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7em;
+    --time-fit-scale: 1;
+    display: inline-flex;
     align-items: baseline;
-    color: var(--text-secondary);
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible;
+    white-space: nowrap;
+    transform-origin: left center;
+    will-change: transform;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: clamp(128px, 14.7vw, 282px);
+    line-height: 0.86;
+    font-weight: 610;
+    letter-spacing: -0.087em;
+    font-variant-numeric: tabular-nums;
+    text-rendering: geometricPrecision;
+    text-shadow: 0 0 24px rgba(182, 206, 244, 0.115), 0 18px 46px rgba(0, 0, 0, 0.2);
+}
+
+.time-char {
+    display: inline-block;
+    min-width: 0.58em;
+    color: transparent;
+    background:
+        linear-gradient(180deg, #ffffff 0%, #eef4ff 28%, #b9c8dc 72%, #eef5ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(210, 226, 250, 0.075));
+}
+
+.time-char.digit {
+    text-align: center;
+}
+
+.time-char.colon {
+    min-width: 0.24em;
+    margin: 0 0.035em 0 0.055em;
+    font-weight: 430;
+    opacity: 0.74;
+    background: linear-gradient(180deg, #edf4ff, #97a9bd);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.digit-0,
+.digit-8 {
+    letter-spacing: -0.095em;
+}
+
+.digit-1 {
+    min-width: 0.43em;
+    font-weight: 560;
+    letter-spacing: -0.03em;
+}
+
+.digit-3,
+.digit-5,
+.digit-7 {
+    background-image: linear-gradient(180deg, #fbfdff 0%, #dbe6f4 36%, #9eafc4 100%);
+}
+
+.digit-4 {
+    min-width: 0.54em;
+}
+
+.display[data-font-preset="readable"] .time {
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-weight: 650;
+    letter-spacing: -0.072em;
+}
+
+.display[data-font-preset="readable"] .time-char {
+    min-width: 0.6em;
+    margin-right: -0.012em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #eef5ff 32%, #c1cedf 78%, #f2f7ff 100%);
+    filter: drop-shadow(0 0 9px rgba(210, 226, 250, 0.07));
+}
+
+.display[data-font-preset="readable"] .digit-1 {
+    min-width: 0.45em;
+}
+
+.display[data-font-preset="soft"] .time {
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
+    font-weight: 620;
+    letter-spacing: -0.052em;
+    text-shadow: 0 0 22px rgba(229, 220, 244, 0.12), 0 18px 42px rgba(0, 0, 0, 0.19);
+}
+
+.display[data-font-preset="soft"] .time-char {
+    min-width: 0.6em;
+    margin-right: -0.006em;
+    border-radius: 0.08em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #f3eefc 34%, #c9d5e4 76%, #f6fbff 100%);
+    filter: drop-shadow(0 0 11px rgba(226, 213, 244, 0.09));
+}
+
+.display[data-font-preset="soft"] .time-char.colon {
+    margin-inline: 0.07em 0.05em;
+    opacity: 0.68;
+    background-image: linear-gradient(180deg, #fff7fd, #a9bbce);
+}
+
+.display[data-font-preset="soft"] .digit-0,
+.display[data-font-preset="soft"] .digit-8 {
+    min-width: 0.62em;
+}
+
+.display[data-font-preset="soft"] .digit-1 {
+    min-width: 0.47em;
+    font-weight: 570;
+}
+
+.display[data-font-preset="handwritten"] .time {
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
+    font-weight: 590;
+    letter-spacing: -0.048em;
+    text-shadow: 0 0 18px rgba(220, 231, 248, 0.105), 0 16px 38px rgba(0, 0, 0, 0.18);
+}
+
+.display[data-font-preset="handwritten"] .time-char {
+    min-width: 0.58em;
+    margin-right: -0.004em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #e9f1fb 38%, #aebdd0 100%);
+    filter: drop-shadow(0 0 8px rgba(214, 229, 248, 0.065));
+}
+
+.display[data-font-preset="handwritten"] .time-char.colon {
+    min-width: 0.25em;
+    margin-inline: 0.055em 0.055em;
+    transform: translateY(-0.01em) rotate(-0.4deg);
+    opacity: 0.7;
+}
+
+.display[data-font-preset="handwritten"] .digit-0 { transform: translateY(0.008em) rotate(-0.7deg); }
+.display[data-font-preset="handwritten"] .digit-1 { min-width: 0.44em; transform: translateY(-0.012em) rotate(0.8deg); font-weight: 550; }
+.display[data-font-preset="handwritten"] .digit-2 { transform: translateY(0.012em) rotate(-0.5deg); }
+.display[data-font-preset="handwritten"] .digit-3 { transform: translateY(-0.006em) rotate(0.6deg); }
+.display[data-font-preset="handwritten"] .digit-4 { min-width: 0.55em; transform: translateY(0.01em) rotate(-0.6deg); }
+.display[data-font-preset="handwritten"] .digit-5 { transform: translateY(-0.01em) rotate(0.5deg); }
+.display[data-font-preset="handwritten"] .digit-6 { transform: translateY(0.006em) rotate(-0.4deg); }
+.display[data-font-preset="handwritten"] .digit-7 { transform: translateY(-0.014em) rotate(0.7deg); }
+.display[data-font-preset="handwritten"] .digit-8 { transform: translateY(0.004em) rotate(-0.5deg); }
+.display[data-font-preset="handwritten"] .digit-9 { transform: translateY(-0.008em) rotate(0.5deg); }
+
+.display[data-font-preset="design"] .time {
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
+    font-weight: 540;
+    letter-spacing: -0.13em;
+    text-shadow: 0 0 20px rgba(188, 213, 250, 0.1), 0 18px 44px rgba(0, 0, 0, 0.19);
+}
+
+.display[data-font-preset="design"] .time-char {
+    min-width: 0.55em;
+    margin-right: -0.05em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #dfe9f8 24%, #8fa2ba 64%, #f7fbff 100%);
+    filter: drop-shadow(0 0 8px rgba(199, 220, 250, 0.07));
+}
+
+.display[data-font-preset="design"] .time-char.colon {
+    min-width: 0.18em;
+    margin-inline: 0.018em 0.04em;
+    font-weight: 300;
+    opacity: 0.68;
+    transform: translateY(-0.055em);
+    background-image: linear-gradient(180deg, #f8fbff, #8094ad);
+}
+
+.display[data-font-preset="design"] .digit-0,
+.display[data-font-preset="design"] .digit-8 {
+    min-width: 0.51em;
+    font-stretch: condensed;
+    letter-spacing: -0.13em;
+    transform: scaleX(0.9) scaleY(1.045);
+    transform-origin: center bottom;
+}
+
+.display[data-font-preset="design"] .digit-1 {
+    min-width: 0.32em;
+    font-weight: 380;
+    letter-spacing: -0.03em;
+}
+
+.display[data-font-preset="design"] .digit-2,
+.display[data-font-preset="design"] .digit-3,
+.display[data-font-preset="design"] .digit-5,
+.display[data-font-preset="design"] .digit-7 {
+    min-width: 0.54em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #d7e2f2 30%, #8297b2 100%);
+}
+
+.display[data-font-preset="design"] .digit-4 {
+    min-width: 0.46em;
     font-weight: 500;
-    letter-spacing: 0.04em;
 }
 
-.date {
-    font-size: clamp(34px, 4vw, 72px);
+.display[data-font-preset="design"] .digit-6,
+.display[data-font-preset="design"] .digit-9 {
+    min-width: 0.56em;
 }
 
-.weekday {
-    font-size: clamp(30px, 3.1vw, 56px);
-    color: var(--text-primary);
+.analog-clock {
+    width: clamp(260px, 31.5vw, 520px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
 }
+
+.analog-face {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background:
+        linear-gradient(142deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.025) 36%, rgba(255, 255, 255, 0.055) 100%),
+        radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.145), transparent 28%),
+        radial-gradient(circle at center, rgba(248, 251, 255, 0.04), rgba(248, 251, 255, 0.012) 58%, rgba(248, 251, 255, 0.048));
+    border: 1px solid rgba(231, 240, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.34);
+    border-left-color: rgba(255, 255, 255, 0.26);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -26px 72px rgba(0, 0, 0, 0.13),
+        0 26px 76px rgba(0, 0, 0, 0.24),
+        0 0 62px rgba(177, 199, 232, 0.065);
+    -webkit-backdrop-filter: blur(18px) saturate(112%);
+    backdrop-filter: blur(18px) saturate(112%);
+}
+
+.analog-face::before,
+.analog-face::after {
+    position: absolute;
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+}
+
+.analog-face::before {
+    inset: 8.5%;
+    border: 1px solid rgba(231, 240, 255, 0.118);
+    box-shadow: inset 18px 18px 46px rgba(255, 255, 255, 0.035);
+}
+
+.analog-face::after {
+    inset: -20%;
+    background:
+        linear-gradient(118deg, transparent 20%, rgba(255, 255, 255, 0.13) 34%, transparent 49%),
+        radial-gradient(circle at 72% 20%, rgba(255, 255, 255, 0.075), transparent 22%);
+    opacity: 0.58;
+}
+
+.minute-ring {
+    position: absolute;
+    inset: 5.8%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+        from 0deg,
+        rgba(226, 236, 252, 0.18) 0deg 0.55deg,
+        transparent 0.55deg 6deg
+    );
+    -webkit-mask: radial-gradient(circle, transparent 70.5%, #000 71.4%, #000 73.4%, transparent 74.2%);
+    mask: radial-gradient(circle, transparent 70.5%, #000 71.4%, #000 73.4%, transparent 74.2%);
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.hour-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(4px, 0.45vw, 8px);
+    height: clamp(22px, 2.4vw, 42px);
+    border-radius: 999px;
+    background: rgba(238, 245, 255, 0.56);
+    z-index: 2;
+    transform-origin: center calc(50% + clamp(98px, 12.05vw, 199px));
+}
+
+.mark-12 { transform: translate(-50%, calc(-50% - clamp(98px, 12.05vw, 199px))); }
+.mark-3 { transform: translate(calc(-50% + clamp(98px, 12.05vw, 199px)), -50%) rotate(90deg); }
+.mark-6 { transform: translate(-50%, calc(-50% + clamp(98px, 12.05vw, 199px))); }
+.mark-9 { transform: translate(calc(-50% - clamp(98px, 12.05vw, 199px)), -50%) rotate(90deg); }
+
+.hand {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    border-radius: 999px;
+    transform-origin: 50% 100%;
+    transform: translateX(-50%) rotate(0deg);
+}
+
+.hour-hand {
+    width: clamp(8px, 0.72vw, 14px);
+    height: 26%;
+    background: linear-gradient(180deg, #f1f6ff, #aebbd0);
+    box-shadow: 0 0 16px rgba(218, 230, 248, 0.12);
+    z-index: 3;
+}
+
+.minute-hand {
+    width: clamp(5px, 0.48vw, 9px);
+    height: 36%;
+    background: linear-gradient(180deg, #dce7f8, #8997ac);
+    box-shadow: 0 0 16px rgba(218, 230, 248, 0.12);
+    z-index: 3;
+}
+
+.pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(18px, 1.65vw, 30px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #eef4ff;
+    box-shadow: 0 0 0 clamp(5px, 0.46vw, 9px) rgba(238, 244, 255, 0.085), 0 0 22px rgba(219, 230, 248, 0.18);
+    transform: translate(-50%, -50%);
+    z-index: 4;
+}
+
 
 .calendar-panel {
-    padding: clamp(28px, 3vw, 48px);
-    border-radius: 36px;
-    background: var(--panel);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+    position: relative;
+    overflow: hidden;
+    padding: clamp(30px, 3.1vw, 50px);
+    border: 1px solid var(--panel-border-soft);
+    border-top-color: rgba(255, 255, 255, 0.22);
+    border-left-color: rgba(255, 255, 255, 0.17);
+    border-radius: clamp(30px, 3vw, 44px);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.018)),
+        var(--panel);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.105),
+        inset 0 -20px 58px rgba(0, 0, 0, 0.095),
+        0 18px 54px rgba(0, 0, 0, 0.18),
+        0 0 46px rgba(155, 180, 218, 0.045);
+    -webkit-backdrop-filter: blur(22px) saturate(116%);
+    backdrop-filter: blur(22px) saturate(116%);
+}
+
+.calendar-panel::before,
+.calendar-panel::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+}
+
+.calendar-panel::before {
+    background: linear-gradient(126deg, rgba(255, 255, 255, 0.16), transparent 31%, transparent 72%, rgba(255, 255, 255, 0.035));
+    opacity: 0.6;
+}
+
+.calendar-panel::after {
+    background:
+        radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.055) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 78% 62%, rgba(255, 255, 255, 0.04) 0 1px, transparent 1.4px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006));
+    background-size: 28px 28px, 34px 34px, auto;
+    opacity: 0.34;
+}
+
+.calendar-panel > * {
+    position: relative;
+    z-index: 1;
 }
 
 .month-title {
-    margin-bottom: clamp(22px, 2.2vw, 36px);
+    margin-bottom: clamp(22px, 2.2vw, 38px);
+    display: inline-flex;
+    align-items: baseline;
     color: var(--text-primary);
-    font-size: clamp(30px, 2.8vw, 48px);
-    font-weight: 650;
+    font-size: clamp(32px, 2.9vw, 50px);
+    font-weight: 660;
+    letter-spacing: 0.035em;
+    white-space: nowrap;
+}
+
+.calendar-title-number {
+    display: inline-block;
+    min-width: 1ch;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: 1.04em;
+    font-weight: 670;
+    line-height: 1;
+    letter-spacing: 0.012em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #ffffff 0%, #c8d4e4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 9px rgba(210, 226, 250, 0.075));
+}
+
+.calendar-title-unit {
+    margin-inline: 0.08em 0.18em;
+    color: rgba(243, 247, 255, 0.82);
+    font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.78em;
+    font-weight: 620;
     letter-spacing: 0.04em;
+}
+
+.calendar-title-spacer {
+    width: 0.24em;
+    flex: 0 0 0.24em;
+}
+
+.display[data-font-preset="readable"] .calendar-title-number {
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-weight: 690;
+    letter-spacing: 0.008em;
+}
+
+.display[data-font-preset="soft"] .calendar-title-number {
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
+    font-weight: 640;
+    letter-spacing: 0.02em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #cbd8e7 100%);
+    filter: drop-shadow(0 0 10px rgba(226, 213, 244, 0.08));
+}
+
+.display[data-font-preset="handwritten"] .calendar-title-number {
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
+    font-weight: 610;
+    letter-spacing: 0.012em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #b7c6d8 100%);
+}
+
+.display[data-font-preset="design"] .calendar-title-number {
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
+    font-weight: 560;
+    letter-spacing: -0.015em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #8fa4bf 100%);
 }
 
 .calendar-weekdays,
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: clamp(8px, 0.75vw, 14px);
+    gap: clamp(8px, 0.78vw, 15px);
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
 .calendar-weekdays {
-    margin-bottom: clamp(10px, 1vw, 18px);
+    margin-bottom: clamp(11px, 1vw, 19px);
     color: var(--text-muted);
-    font-size: clamp(18px, 1.35vw, 27px);
-    font-weight: 600;
+    font-size: clamp(19px, 1.42vw, 28px);
+    font-weight: 670;
 }
 
 .calendar-day {
@@ -111,19 +599,109 @@ body {
     place-items: center;
     border-radius: 999px;
     color: var(--text-secondary);
-    font-size: clamp(22px, 2vw, 36px);
-    font-weight: 540;
 }
 
 .calendar-day.is-empty {
     color: transparent;
 }
 
+.calendar-number {
+    display: inline-grid;
+    min-width: 2ch;
+    place-items: center;
+    color: currentColor;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: clamp(24px, 2.08vw, 38px);
+    font-weight: 610;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #f9fbff 0%, #c4cfdd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 7px rgba(210, 226, 250, 0.055));
+}
+
+.display[data-font-preset="readable"] .calendar-number {
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-weight: 640;
+    letter-spacing: 0.005em;
+}
+
+.display[data-font-preset="soft"] .calendar-number {
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
+    font-weight: 610;
+    letter-spacing: 0.018em;
+    background-image: linear-gradient(180deg, #fffafd 0%, #c9d5e4 100%);
+    filter: drop-shadow(0 0 8px rgba(226, 213, 244, 0.065));
+}
+
+.display[data-font-preset="handwritten"] .calendar-number {
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
+    font-weight: 590;
+    letter-spacing: 0.01em;
+    background-image: linear-gradient(180deg, #fffefa 0%, #afbdd0 100%);
+}
+
+.display[data-font-preset="design"] .calendar-number {
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
+    min-width: 1.85ch;
+    font-weight: 540;
+    letter-spacing: -0.018em;
+    background-image: linear-gradient(180deg, #ffffff 0%, #879bb5 100%);
+}
+
 .calendar-day.is-today {
     background: var(--today);
     color: var(--today-text);
-    font-weight: 800;
-    box-shadow: 0 0 28px rgba(219, 230, 255, 0.22);
+    font-weight: 820;
+    box-shadow: 0 0 30px rgba(226, 235, 250, 0.2);
+}
+
+.calendar-day.is-today .calendar-number {
+    background: none;
+    color: var(--today-text);
+    filter: none;
+}
+
+.font-toast {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(26px, 3.2vw, 54px);
+    z-index: 5;
+    padding: 0.42em 0.84em;
+    border: 1px solid rgba(234, 242, 255, 0.11);
+    border-radius: 999px;
+    background: rgba(10, 16, 26, 0.42);
+    color: rgba(236, 243, 255, 0.82);
+    font-size: clamp(16px, 1.25vw, 24px);
+    font-weight: 560;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 10px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    -webkit-backdrop-filter: blur(16px) saturate(112%);
+    backdrop-filter: blur(16px) saturate(112%);
+}
+
+.font-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 @media (max-aspect-ratio: 4 / 3) {
@@ -133,6 +711,6 @@ body {
     }
 
     .calendar-panel {
-        max-width: 680px;
+        max-width: 700px;
     }
 }
