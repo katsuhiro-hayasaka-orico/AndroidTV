@@ -29,11 +29,12 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(false);
+        // 時計表示モードと数字フォントプリセットを localStorage に保存するため、DOM Storage のみ有効化します。
+        settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(false);
         settings.setBlockNetworkLoads(true);
-        webView.setBackgroundColor(0xFF05070D);
+        webView.setBackgroundColor(0xFF03050A);
         webView.loadUrl("file:///android_asset/index.html");
 
         setContentView(webView);
@@ -67,6 +68,21 @@ public class MainActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             finish();
+            return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+            // Android TVリモコンの決定ボタンをWebView内の時計表示切り替えに確実に渡します。
+            if (webView != null) {
+                webView.evaluateJavascript("window.toggleClockModeFromAndroid && window.toggleClockModeFromAndroid()", null);
+            }
+            return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            // 数字フォントプリセット切り替えも、TVリモコンの左右キーからWebViewへ明示的に渡します。
+            if (webView != null) {
+                int direction = keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1;
+                webView.evaluateJavascript("window.cycleFontPresetFromAndroid && window.cycleFontPresetFromAndroid(" + direction + ")", null);
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
