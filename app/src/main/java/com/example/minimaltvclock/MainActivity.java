@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         // 時計表示モードと数字フォントプリセットを localStorage に保存するため、DOM Storage のみ有効化します。
         settings.setDomStorageEnabled(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(false);
         settings.setBlockNetworkLoads(true);

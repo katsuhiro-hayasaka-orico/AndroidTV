@@ -774,7 +774,8 @@ body::after {
     opacity: 0;
 }
 
-.font-toast {
+.font-toast,
+.chime-toast {
     position: fixed;
     left: 50%;
     bottom: clamp(26px, 3.2vw, 54px);
@@ -795,9 +796,20 @@ body::after {
     backdrop-filter: blur(16px) saturate(112%);
 }
 
-.font-toast.is-visible {
+.font-toast.is-visible,
+.chime-toast.is-visible {
     opacity: 1;
     transform: translate(-50%, 0);
+}
+
+
+.chime-toast {
+    bottom: clamp(68px, 6.2vw, 112px);
+    padding-inline: 0.9em;
+    color: rgba(230, 244, 255, 0.78);
+    font-size: clamp(14px, 1.05vw, 20px);
+    letter-spacing: 0.08em;
+    background: rgba(13, 22, 34, 0.34);
 }
 
 .sr-only {
