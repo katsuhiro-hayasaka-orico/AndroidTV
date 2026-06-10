@@ -28,6 +28,7 @@ let clockMode = loadClockMode();
 let fontPreset = loadFontPreset();
 let renderedTimeText = '';
 let fontToastTimerId;
+let fitDigitalTimeFrameId;
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -87,6 +88,8 @@ function applyFontPreset(presetId, shouldAnnounce = false) {
     fontPreset = nextPreset;
     displayElement.setAttribute('data-font-preset', nextPreset);
     saveFontPreset(nextPreset);
+
+    scheduleFitDigitalTime();
 
     if (shouldAnnounce) {
         showFontToast(nextPreset);
@@ -168,6 +171,34 @@ function renderDigitalTime(timeText) {
     timeElement.replaceChildren(...timeCharacters);
     timeElement.setAttribute('aria-label', timeText);
     renderedTimeText = timeText;
+    scheduleFitDigitalTime();
+}
+
+function fitDigitalTime() {
+    const parentElement = timeElement.parentElement;
+    if (!parentElement) {
+        return;
+    }
+
+    timeElement.style.setProperty('--time-fit-scale', '1');
+    const availableWidth = parentElement.clientWidth;
+    const requiredWidth = timeElement.scrollWidth;
+    if (availableWidth <= 0 || requiredWidth <= 0) {
+        return;
+    }
+
+    const nextScale = Math.max(0.86, Math.min(1, availableWidth / requiredWidth));
+    timeElement.style.setProperty('--time-fit-scale', nextScale.toFixed(3));
+}
+
+function scheduleFitDigitalTime() {
+    window.cancelAnimationFrame(fitDigitalTimeFrameId);
+    fitDigitalTimeFrameId = window.requestAnimationFrame(() => {
+        fitDigitalTime();
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(fitDigitalTime);
+        }
+    });
 }
 
 function updateAnalogClock(hours, minutes) {
@@ -278,4 +309,5 @@ updateClock();
 scheduleNextMinuteTick();
 nudgeDisplay();
 window.setInterval(nudgeDisplay, 6 * 60 * 1000);
+window.addEventListener('resize', scheduleFitDigitalTime);
 document.addEventListener('keydown', handleClockModeKey);

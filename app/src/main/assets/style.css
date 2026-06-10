@@ -1,3 +1,35 @@
+@font-face {
+    font-family: "ClockReadable";
+    src: url("fonts/readable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockSoft";
+    src: url("fonts/soft.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockHandwritten";
+    src: url("fonts/handwritten.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ClockDesign";
+    src: url("fonts/design.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     color-scheme: dark;
     --background-deep: #02040a;
@@ -55,8 +87,8 @@ body::before {
     height: min(100vh, 1080px);
     padding: clamp(58px, 7vw, 128px);
     display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(390px, 0.78fr);
-    gap: clamp(54px, 6.6vw, 118px);
+    grid-template-columns: minmax(0, 1.34fr) minmax(370px, 0.78fr);
+    gap: clamp(46px, 5.7vw, 104px);
     align-items: center;
     transition: transform 1200ms ease-in-out;
     will-change: transform;
@@ -64,6 +96,45 @@ body::before {
 
 .clock-panel {
     min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.clock-stage {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: clamp(230px, 28vw, 465px);
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+}
+
+[data-clock-view] {
+    grid-area: 1 / 1;
+    transition: opacity 420ms ease, transform 420ms ease, filter 420ms ease;
+}
+
+.display.is-digital [data-clock-view="analog"],
+.display.is-analog [data-clock-view="digital"] {
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+    filter: blur(4px);
+}
+
+.display.is-digital [data-clock-view="digital"],
+.display.is-analog [data-clock-view="analog"] {
+    opacity: 1;
+    filter: blur(0);
+}
+
+.display.is-digital .time[data-clock-view="digital"] {
+    transform: translateY(0) scale(var(--time-fit-scale, 1));
+}
+
+.display.is-analog .analog-clock[data-clock-view="analog"] {
+    transform: translateY(0) scale(1);
 }
 
 .clock-stage {
@@ -93,10 +164,17 @@ body::before {
 }
 
 .time {
+    --time-fit-scale: 1;
     display: inline-flex;
     align-items: baseline;
-    font-family: "Avenir Next", "Century Gothic", "Trebuchet MS", "Segoe UI", "Roboto", system-ui, sans-serif;
-    font-size: clamp(136px, 15.5vw, 298px);
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible;
+    white-space: nowrap;
+    transform-origin: left center;
+    will-change: transform;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
+    font-size: clamp(128px, 14.7vw, 282px);
     line-height: 0.86;
     font-weight: 610;
     letter-spacing: -0.087em;
@@ -152,7 +230,7 @@ body::before {
 }
 
 .display[data-font-preset="readable"] .time {
-    font-family: "Avenir Next", "Segoe UI", "Roboto", "Helvetica Neue", system-ui, sans-serif;
+    font-family: "ClockReadable", "Roboto", system-ui, sans-serif;
     font-weight: 650;
     letter-spacing: -0.072em;
 }
@@ -169,7 +247,7 @@ body::before {
 }
 
 .display[data-font-preset="soft"] .time {
-    font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", "Roboto", system-ui, sans-serif;
+    font-family: "ClockSoft", "Roboto", system-ui, sans-serif;
     font-weight: 620;
     letter-spacing: -0.052em;
     text-shadow: 0 0 22px rgba(229, 220, 244, 0.12), 0 18px 42px rgba(0, 0, 0, 0.19);
@@ -200,7 +278,7 @@ body::before {
 }
 
 .display[data-font-preset="handwritten"] .time {
-    font-family: "Comic Sans MS", "Segoe Print", "Trebuchet MS", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    font-family: "ClockHandwritten", "Roboto", system-ui, sans-serif;
     font-weight: 590;
     letter-spacing: -0.048em;
     text-shadow: 0 0 18px rgba(220, 231, 248, 0.105), 0 16px 38px rgba(0, 0, 0, 0.18);
@@ -232,7 +310,7 @@ body::before {
 .display[data-font-preset="handwritten"] .digit-9 { transform: translateY(-0.008em) rotate(0.5deg); }
 
 .display[data-font-preset="design"] .time {
-    font-family: "Century Gothic", "Avenir Next", "Trebuchet MS", "Segoe UI", "Roboto", system-ui, sans-serif;
+    font-family: "ClockDesign", "Roboto", system-ui, sans-serif;
     font-weight: 540;
     letter-spacing: -0.13em;
     text-shadow: 0 0 20px rgba(188, 213, 250, 0.1), 0 18px 44px rgba(0, 0, 0, 0.19);

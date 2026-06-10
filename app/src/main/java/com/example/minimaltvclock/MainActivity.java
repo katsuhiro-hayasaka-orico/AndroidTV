@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
-        // 時計表示モードを localStorage に保存するため、DOM Storage のみ有効化します。
+        // 時計表示モードと数字フォントプリセットを localStorage に保存するため、DOM Storage のみ有効化します。
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(false);
