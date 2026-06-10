@@ -10,12 +10,28 @@ const FONT_PRESETS = [
     { id: 'handwritten', label: 'Handwritten' },
     { id: 'design', label: 'Design' },
 ];
+// Visual alarm: keeps the existing gradient/intensity-only notification.
 const VISUAL_ALARM = {
     enabled: true,
     hour: 17,
     minute: 0,
     leadMinutes: 30,
     fadeOutMinutes: 10,
+};
+
+// Sound chime: local, short, modest-volume audio for office use.
+// For temporary development checks, add a one-minute-ahead entry here and remove it before release.
+const SOUND_CHIME = {
+    enabled: true,
+    audioSource: 'audio/chime.mp3',
+    volume: 0.32,
+    toastDurationMs: 2500,
+    times: [
+        { hour: 9, minute: 20, label: '09:20' },
+        { hour: 11, minute: 30, label: '11:30' },
+        { hour: 12, minute: 30, label: '12:30' },
+        { hour: 17, minute: 45, label: '17:45' },
+    ],
 };
 const VISUAL_ALARM_UPDATE_INTERVAL_MS = 30 * 1000;
 const MINUTE_IN_MS = 60 * 1000;
@@ -31,6 +47,8 @@ const hourHandElement = document.getElementById('hourHand');
 const minuteHandElement = document.getElementById('minuteHand');
 const analogLabelElement = document.getElementById('analogLabel');
 const fontToastElement = document.getElementById('fontToast');
+const chimeToastElement = document.getElementById('chimeToast');
+const chimeAudioElement = document.getElementById('chimeAudio');
 
 let renderedCalendarKey = '';
 let minuteTimerId;
@@ -39,8 +57,11 @@ let clockMode = loadClockMode();
 let fontPreset = loadFontPreset();
 let renderedTimeText = '';
 let fontToastTimerId;
+let chimeToastTimerId;
+let fallbackAudioContext;
 let fitDigitalTimeFrameId;
 let lastClockToggleAt = Number.NEGATIVE_INFINITY;
+let lastPlayedChimeKey = '';
 
 function pad(value) {
     return String(value).padStart(2, '0');
@@ -177,6 +198,7 @@ function updateClock() {
     const minutes = now.getMinutes();
 
     updateVisualAlarm(now);
+    updateSoundChime(now);
     renderDigitalTime(`${pad(hours)}:${pad(minutes)}`);
     updateAnalogClock(hours, minutes);
 
@@ -247,6 +269,170 @@ function updateAnalogClock(hours, minutes) {
     hourHandElement.style.transform = `translateX(-50%) rotate(${hourDegrees}deg)`;
     minuteHandElement.style.transform = `translateX(-50%) rotate(${minuteDegrees}deg)`;
     analogLabelElement.textContent = `${hours}時${pad(minutes)}分`;
+}
+
+
+function createChimeKey(now, chimeTime) {
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${chimeTime.label}`;
+}
+
+function findMatchingChimeTime(now) {
+    if (!SOUND_CHIME.enabled) {
+        return null;
+    }
+
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    return SOUND_CHIME.times.find((chimeTime) => chimeTime.hour === hours && chimeTime.minute === minutes) || null;
+}
+
+function updateSoundChime(now) {
+    const chimeTime = findMatchingChimeTime(now);
+    if (!chimeTime) {
+        return;
+    }
+
+    const chimeKey = createChimeKey(now, chimeTime);
+    if (chimeKey === lastPlayedChimeKey) {
+        return;
+    }
+
+    lastPlayedChimeKey = chimeKey;
+    playChime(chimeTime.label);
+}
+
+function initializeChimeAudio() {
+    if (!chimeAudioElement) {
+        return;
+    }
+
+    chimeAudioElement.volume = SOUND_CHIME.volume;
+    if (!chimeAudioElement.getAttribute('src')) {
+        chimeAudioElement.setAttribute('src', SOUND_CHIME.audioSource);
+    }
+}
+
+function playChime(label) {
+    if (!SOUND_CHIME.enabled) {
+        return;
+    }
+
+    showChimeToast(label);
+
+    if (!chimeAudioElement) {
+        playFallbackChime(label);
+        return;
+    }
+
+    try {
+        chimeAudioElement.pause();
+        chimeAudioElement.currentTime = 0;
+        chimeAudioElement.volume = SOUND_CHIME.volume;
+
+        const playPromise = chimeAudioElement.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch((error) => {
+                console.warn(`Local chime audio failed (${label}). Falling back to generated chime.`, error);
+                playFallbackChime(label);
+            });
+        }
+    } catch (error) {
+        console.warn(`Local chime audio could not start (${label}). Falling back to generated chime.`, error);
+        playFallbackChime(label);
+    }
+}
+
+function showChimeToast(label) {
+    if (!chimeToastElement) {
+        return;
+    }
+
+    window.clearTimeout(chimeToastTimerId);
+    chimeToastElement.textContent = `Chime ${label}`;
+    chimeToastElement.classList.add('is-visible');
+    chimeToastElement.setAttribute('aria-hidden', 'false');
+
+    chimeToastTimerId = window.setTimeout(() => {
+        chimeToastElement.classList.remove('is-visible');
+        chimeToastElement.setAttribute('aria-hidden', 'true');
+    }, SOUND_CHIME.toastDurationMs);
+}
+
+function getFallbackAudioContext() {
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) {
+        return null;
+    }
+
+    if (!fallbackAudioContext) {
+        fallbackAudioContext = new AudioContextConstructor();
+    }
+
+    if (fallbackAudioContext.state === 'suspended' && fallbackAudioContext.resume) {
+        fallbackAudioContext.resume().catch((error) => {
+            console.warn('Generated chime audio context could not resume.', error);
+        });
+    }
+
+    return fallbackAudioContext;
+}
+
+function scheduleFallbackTone(audioContext, destination, frequency, startTime, duration) {
+    const oscillator = audioContext.createOscillator();
+    const overtone = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const overtoneGain = audioContext.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+    overtone.type = 'triangle';
+    overtone.frequency.setValueAtTime(frequency * 2, startTime);
+
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(SOUND_CHIME.volume * 0.38, startTime + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    overtoneGain.gain.setValueAtTime(0.0001, startTime);
+    overtoneGain.gain.exponentialRampToValueAtTime(SOUND_CHIME.volume * 0.07, startTime + 0.02);
+    overtoneGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration * 0.72);
+
+    oscillator.connect(gain).connect(destination);
+    overtone.connect(overtoneGain).connect(destination);
+
+    oscillator.start(startTime);
+    overtone.start(startTime);
+    oscillator.stop(startTime + duration + 0.04);
+    overtone.stop(startTime + duration + 0.04);
+}
+
+function playFallbackChime(label) {
+    try {
+        const audioContext = getFallbackAudioContext();
+        if (!audioContext) {
+            console.warn(`Generated chime unavailable (${label}): Web Audio API is not supported.`);
+            return;
+        }
+
+        const masterGain = audioContext.createGain();
+        masterGain.gain.setValueAtTime(1, audioContext.currentTime);
+        masterGain.connect(audioContext.destination);
+
+        const startTime = audioContext.currentTime + 0.04;
+        const melody = [659.25, 523.25, 587.33, 392.0];
+        melody.forEach((frequency, index) => {
+            scheduleFallbackTone(audioContext, masterGain, frequency, startTime + (index * 0.34), 0.28);
+        });
+
+        window.setTimeout(() => {
+            try {
+                masterGain.disconnect();
+            } catch (error) {
+                // 接続解除に失敗しても時計表示には影響させない。
+            }
+        }, 1800);
+    } catch (error) {
+        console.warn(`Generated chime failed (${label}).`, error);
+    }
 }
 
 function clamp(value, min, max) {
@@ -404,6 +590,7 @@ function nudgeDisplay() {
 
 window.toggleClockModeFromAndroid = toggleClockMode;
 window.cycleFontPresetFromAndroid = cycleFontPreset;
+window.playTestChime = () => playChime('test');
 
 function handleClockModeKey(event) {
     const isDecisionKey = event.key === 'Enter'
@@ -436,6 +623,7 @@ function handleClockModeKey(event) {
     }
 }
 
+initializeChimeAudio();
 applyFontPreset(fontPreset);
 applyClockMode(clockMode);
 updateClock();
