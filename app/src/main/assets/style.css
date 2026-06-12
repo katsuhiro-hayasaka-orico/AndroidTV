@@ -902,3 +902,196 @@ body::after {
         max-width: 700px;
     }
 }
+
+/* Deep sea WebGL backdrop -------------------------------------------------- */
+.deep-sea-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% -6%, rgba(23, 118, 170, 0.24), transparent 34%),
+        radial-gradient(circle at 16% 88%, rgba(5, 37, 58, 0.44), transparent 42%),
+        linear-gradient(180deg, #031426 0%, #020914 48%, #000309 100%);
+}
+
+.deep-sea-canvas,
+.deep-sea-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.deep-sea-canvas {
+    display: block;
+    opacity: 0;
+    transition: opacity 2400ms ease;
+}
+
+.webgl-ready .deep-sea-canvas {
+    opacity: 1;
+}
+
+.webgl-fallback .deep-sea-canvas {
+    display: none;
+}
+
+.deep-sea-fallback {
+    background:
+        radial-gradient(circle at 48% -6%, rgba(23, 118, 170, calc(0.2 + var(--alarm-intensity) * 0.08)), transparent 31%),
+        radial-gradient(ellipse at 72% 68%, rgba(6, 48, 70, 0.34), transparent 42%),
+        radial-gradient(ellipse at 24% 78%, rgba(1, 21, 32, 0.72), transparent 48%),
+        linear-gradient(180deg, #031426 0%, #020914 48%, #000309 100%);
+    opacity: 1;
+}
+
+.deep-sea-fallback::before,
+.deep-sea-fallback::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+}
+
+.deep-sea-fallback::before {
+    background-image:
+        radial-gradient(circle, rgba(150, 224, 242, 0.34) 0 1px, transparent 1.7px),
+        radial-gradient(circle, rgba(190, 232, 242, 0.18) 0 1px, transparent 1.5px);
+    background-position: 0 0, 41px 59px;
+    background-size: 118px 118px, 173px 173px;
+    opacity: 0.26;
+    animation: marine-snow-fallback 48s linear infinite;
+}
+
+.deep-sea-fallback::after {
+    background:
+        linear-gradient(100deg, transparent 22%, rgba(69, 156, 190, 0.06) 35%, transparent 48%),
+        radial-gradient(ellipse at 50% 105%, rgba(0, 0, 0, 0.72), transparent 35%),
+        radial-gradient(circle at 50% 50%, transparent 48%, rgba(0, 0, 0, 0.46) 100%);
+    mix-blend-mode: screen;
+    opacity: 0.62;
+}
+
+body {
+    background: #000309;
+}
+
+body::before {
+    z-index: 2;
+    background:
+        linear-gradient(115deg, rgba(150, 210, 235, 0.045), transparent 20%, transparent 78%, rgba(112, 180, 210, 0.026)),
+        radial-gradient(circle at 50% 50%, transparent 54%, rgba(0, 0, 0, 0.34) 100%);
+    opacity: 0.78;
+}
+
+body::after {
+    z-index: 3;
+    background:
+        radial-gradient(circle at 48% 0%, rgba(125, 224, 255, 0.5), transparent 28%),
+        radial-gradient(circle at 18% 32%, rgba(255, 178, 101, 0.22), transparent 28%),
+        radial-gradient(circle at 77% 22%, rgba(112, 226, 255, 0.28), transparent 30%);
+    mix-blend-mode: screen;
+    opacity: calc(var(--alarm-intensity) * 0.42);
+}
+
+.display {
+    z-index: 4;
+}
+
+.clock-panel,
+.calendar-panel {
+    position: relative;
+}
+
+.clock-panel::before,
+.calendar-panel::before {
+    position: absolute;
+    inset: clamp(-22px, -1.5vw, -14px);
+    z-index: -1;
+    border: 1px solid rgba(155, 218, 242, 0.12);
+    border-top-color: rgba(210, 244, 255, 0.18);
+    border-left-color: rgba(210, 244, 255, 0.15);
+    border-radius: 32px;
+    background:
+        linear-gradient(145deg, rgba(207, 241, 255, 0.07), rgba(10, 32, 48, 0.18) 44%, rgba(1, 8, 16, 0.28)),
+        radial-gradient(circle at 26% 0%, rgba(110, 206, 240, 0.09), transparent 38%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -30px 82px rgba(0, 0, 0, 0.18),
+        0 24px 86px rgba(0, 0, 0, 0.22),
+        0 0 calc(24px + var(--alarm-intensity) * 22px) rgba(76, 198, 236, calc(0.04 + var(--alarm-intensity) * 0.08));
+    -webkit-backdrop-filter: blur(10px) saturate(118%);
+    backdrop-filter: blur(10px) saturate(118%);
+    content: "";
+    pointer-events: none;
+}
+
+.clock-panel::before {
+    right: clamp(-30px, -2.2vw, -18px);
+}
+
+.calendar-panel {
+    background:
+        linear-gradient(145deg, rgba(225, 247, 255, 0.07), rgba(7, 26, 40, 0.2) 48%, rgba(1, 8, 16, 0.34)),
+        radial-gradient(circle at 30% 0%, rgba(89, 189, 224, 0.12), transparent 42%);
+    border-color: rgba(175, 230, 250, 0.18);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 24px 80px rgba(0, 0, 0, 0.28),
+        0 0 calc(18px + var(--alarm-intensity) * 26px) rgba(66, 205, 240, calc(0.04 + var(--alarm-intensity) * 0.08));
+}
+
+.time {
+    text-shadow:
+        0 0 calc(18px + var(--alarm-intensity) * 10px) rgba(132, 224, 255, calc(0.14 + var(--alarm-intensity) * 0.14)),
+        0 18px 52px rgba(0, 0, 0, 0.34);
+}
+
+.time-char {
+    background-image: linear-gradient(180deg, #fbfeff 0%, #d7edf6 42%, #9ab7c8 100%);
+}
+
+.month-title,
+.calendar-day,
+.calendar-weekdays {
+    text-shadow: 0 0 18px rgba(123, 218, 248, 0.08), 0 8px 22px rgba(0, 0, 0, 0.26);
+}
+
+.lab-signature {
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(173, 226, 242, 0.36);
+    text-shadow: 0 0 12px rgba(96, 212, 242, 0.08);
+}
+
+.lab-signature::before {
+    content: "SUBMERSIBLE UNIT · ";
+    opacity: 0.72;
+}
+
+.launch-credit,
+.font-toast,
+.chime-toast {
+    z-index: 5;
+    border-color: rgba(162, 228, 250, 0.18);
+    background: rgba(3, 15, 24, 0.66);
+    box-shadow: 0 14px 46px rgba(0, 0, 0, 0.28), 0 0 24px rgba(87, 210, 244, 0.08);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%);
+}
+
+@keyframes marine-snow-fallback {
+    from { transform: translate3d(0, -118px, 0); }
+    to { transform: translate3d(0, 118px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .deep-sea-fallback::before {
+        animation-duration: 180s;
+    }
+}
+
+.webgl-ready .deep-sea-fallback {
+    opacity: 0;
+}

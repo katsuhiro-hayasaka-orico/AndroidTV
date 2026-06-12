@@ -3,10 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Minimal TV Clock</title>
+    <title>Deep Sea Ambient Clock</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="deepSeaLayer" class="deep-sea-layer" aria-hidden="true">
+        <canvas id="deepSeaCanvas" class="deep-sea-canvas"></canvas>
+        <div class="deep-sea-fallback"></div>
+    </div>
     <main id="display" class="display is-digital" data-font-preset="readable" aria-label="現在時刻と当月カレンダー">
         <section class="clock-panel" aria-label="現在時刻">
             <div class="clock-stage" aria-live="polite">
@@ -45,6 +49,7 @@
     <div id="chimeToast" class="chime-toast" aria-hidden="true"></div>
     <audio id="chimeAudio" src="audio/chime.mp3" preload="auto"></audio>
 
+    <script src="deep-sea.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
