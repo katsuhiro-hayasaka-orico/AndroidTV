@@ -11,12 +11,28 @@
         <canvas id="deepSeaCanvas" class="deep-sea-canvas"></canvas>
         <div class="deep-sea-fallback"></div>
     </div>
+    <div class="abyssal-viewport" aria-hidden="true">
+        <div class="abyssal-beam"></div>
+        <div class="abyssal-grid"></div>
+        <div class="abyssal-vignette"></div>
+    </div>
+    <div class="abyssal-hud" aria-hidden="true">
+        <div class="abyssal-hud__row">
+            <span>ABYSSAL DRIFT</span>
+            <span id="abyssalDate">----</span>
+        </div>
+        <div class="abyssal-hud__row abyssal-hud__row--muted">
+            <span>— 深海 2,800m —</span>
+            <span id="abyssalStatus">DRIFT --</span>
+        </div>
+        <div id="abyssalDepth" class="abyssal-depth">深度 ---- m</div>
+    </div>
     <main id="display" class="display is-digital" data-font-preset="readable" aria-label="現在時刻と当月カレンダー">
         <section class="clock-panel" aria-label="現在時刻">
             <div class="clock-stage" aria-live="polite">
                 <div id="time" class="time" data-clock-view="digital">--:--</div>
 
-                <div class="analog-clock" data-clock-view="analog" aria-label="アナログ時計" role="img">
+                <div id="analogClock" class="analog-clock" data-clock-view="analog" aria-label="アナログ時計" role="img">
                     <div class="analog-face" aria-hidden="true">
                         <span class="hour-mark mark-12"></span>
                         <span class="hour-mark mark-3"></span>
@@ -41,15 +57,14 @@
             </div>
             <div id="calendar" class="calendar-grid"></div>
         </aside>
-
-        <div class="lab-signature" aria-hidden="true">Innovation Lab</div>
     </main>
-    <div id="launchCredit" class="launch-credit" aria-hidden="true">Crafted by Innovation Lab</div>
+    <div class="innovation-credit" aria-hidden="true">Created by Innovation Lab</div>
     <div id="fontToast" class="font-toast" aria-hidden="true"></div>
     <div id="chimeToast" class="chime-toast" aria-hidden="true"></div>
     <audio id="chimeAudio" src="audio/chime.mp3" preload="auto"></audio>
 
     <script src="deep-sea.js"></script>
+    <script src="abyssal-ui.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
